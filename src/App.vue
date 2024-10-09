@@ -2,7 +2,6 @@
 import { DeleteOutlined } from '@ant-design/icons-vue'
 import { ref, reactive } from 'vue'
 import type { Reactive } from 'vue'
-import { v4 as uuidv4 } from 'uuid'
 import EditorComponent from './views/homeView/HomeView.vue'
 
 type ListItem = {
@@ -15,10 +14,10 @@ const id = ref('')
 const editorData = ref({})
 
 const handleAdd = () => {
-  const uuid = uuidv4()
+  const uuid = crypto.randomUUID()
   id.value = uuid
   list.push({
-    title: '',
+    title: '新建备忘录',
     // component: EditorComponent,
     uuid
   })
@@ -70,7 +69,6 @@ const getEditorData = (data: unknown) => {
     width: 20vw;
     border-right: 1px solid #ccc;
     height: 100vh;
-    display: flex;
     .side-add {
       display: flex;
       justify-content: center;
@@ -99,6 +97,9 @@ const getEditorData = (data: unknown) => {
         flex: 1;
       }
     }
+  }
+  .content {
+    flex: 1;
   }
 }
 </style>

@@ -1,5 +1,8 @@
-const { app, BrowserWindow } = require("electron");
-const path = require("path");
+import require$$0 from "electron";
+import require$$1 from "path";
+var main = {};
+const { app, BrowserWindow } = require$$0;
+const path = require$$1;
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -24,3 +27,6 @@ app.whenReady().then(() => {
 app.on("window-all-closed", function() {
   if (process.platform !== "darwin") app.quit();
 });
+export {
+  main as default
+};

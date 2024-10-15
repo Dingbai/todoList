@@ -1,7 +1,7 @@
 import require$$0 from "electron";
 import require$$1 from "path";
 var main = {};
-const { app, BrowserWindow } = require$$0;
+const { app, BrowserWindow, globalShortcut } = require$$0;
 const path = require$$1;
 function createWindow() {
   const win = new BrowserWindow({
@@ -10,6 +10,9 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
+    },
+    webContents: {
+      openDevTools: true
     }
   });
   if (process.env.VITE_DEV_SERVER_URL) {
@@ -22,6 +25,9 @@ app.whenReady().then(() => {
   createWindow();
   app.on("activate", function() {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+  globalShortcut.register("CommandOrControl+Shift+I", () => {
+    BrowserWindow.getFocusedWindow().webContents.toggleDevTools();
   });
 });
 app.on("window-all-closed", function() {

@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, globalShortcut } = require('electron')
 const path = require('path')
 
 function createWindow() {
@@ -8,6 +8,9 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
+    },
+    webContents: {
+      openDevTools: true
     }
   })
 
@@ -23,6 +26,9 @@ app.whenReady().then(() => {
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+  globalShortcut.register('CommandOrControl+Shift+I', () => {
+    BrowserWindow.getFocusedWindow().webContents.toggleDevTools()
   })
 })
 

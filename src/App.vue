@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import type { Ref } from 'vue'
+import { ref } from 'vue'
 import Content from './components/content/Content.vue'
 import SideBar from './components/sideBar/SideBar.vue'
+import { useDataStore } from '@/stores/update'
 
-const getEditData = (data: { header: string; editData: {} }) => {
-  console.log(data.header)
-  console.log(data.editData)
-}
+const isShowContent = ref(false)
+
+const dataStore = useDataStore()
+dataStore.$subscribe(() => {
+  dataStore.hasCurrentItem() && (isShowContent.value = true)
+})
 </script>
 
 <template>
   <div class="app-container">
     <SideBar />
     <div class="content">
-      <Content @update:data="getEditData" />
+      <Content v-show="isShowContent" />
     </div>
   </div>
 </template>
@@ -26,7 +29,6 @@ const getEditData = (data: { header: string; editData: {} }) => {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  // background-color: #f0f2f5;
 
   .content {
     flex: 1;

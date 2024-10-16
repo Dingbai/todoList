@@ -1,27 +1,33 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch, type Ref } from 'vue'
-import EditorJS from '@editorjs/editorjs'
+import EditorJS, { type OutputData } from '@editorjs/editorjs'
 import Header from '@editorjs/header'
 import List from '@editorjs/list'
+import { useDataStore } from '@/stores/update'
 // import ImageTool from '@editorjs/image'
-
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => ({})
-  }
-})
-
-const emit = defineEmits(['update:data'])
 
 const editor = ref<EditorJS | null>(null)
 const editorId = 'editorjs-container'
-const header = ref('')
-const editData = ref({})
+const title = ref('')
+const editData = ref<OutputData | null>(null)
+const dataStore = useDataStore()
 
-watch(header, (newValue) => {
+dataStore.$subscribe(() => {
+  const currentItem = dataStore.getCurrentItem()
+  title.value = currentItem?.title || ''
+  editData.value = currentItem?.editData || null
+  if (currentItem?.editData) {
+    editor.value?.render(
+      currentItem.editData
+      // blocks: currentItem?.editData?.blocks || []
+    )
+  }
+})
+
+watch(title, (newValue) => {
   if (newValue.trim()) {
-    updateData(newValue, editData.value)
+    const data = { id: dataStore.id, title: newValue, editData: editData.value }
+    dataStore.update(data)
   }
 })
 
@@ -34,13 +40,19 @@ onMounted(() => {
       // image: ImageTool
     },
     data: {
-      ...props.data,
-      blocks: []
+      ...editData.value,
+      blocks: editData.value?.blocks || []
     },
     onChange: async () => {
-      const outputData = (await editor.value?.save()) || {}
+      const outputData = (await editor.value?.save()) || null
       editData.value = outputData
-      updateData(header.value, outputData)
+      const data = { id: dataStore.id, title: title.value, editData: outputData }
+      dataStore.update(data)
+    },
+    onReady: () => {
+      if (editData.value) {
+        editor.value?.render(editData.value)
+      }
     }
   })
 })
@@ -50,17 +62,10 @@ onBeforeUnmount(() => {
     editor.value.destroy()
   }
 })
-
-const updateData = (title: string, data: {}) => {
-  emit('update:data', {
-    header: title,
-    editData: data
-  })
-}
 </script>
 <template>
   <div class="edit-container">
-    <a-input v-model:value="header" />
+    <a-input v-model:value="title" />
     <div id="editorjs-container" />
   </div>
 </template>

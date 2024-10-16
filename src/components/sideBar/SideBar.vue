@@ -1,34 +1,34 @@
 <script setup lang="ts">
 // import { DeleteOutlined } from '@ant-design/icons-vue'
-import { ref, reactive } from 'vue'
-import type { Reactive } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { useDataStore } from '@/stores/update'
 
-type ListItem = {
-  title: string
-  // component: InstanceType<typeof EditorComponent>
-  uuid: string
-}
-const list: Reactive<ListItem[]> = reactive(
-  localStorage.getItem('list') ? JSON.parse(localStorage.getItem('list') || '') : []
-)
-const id = ref('')
 const task = ref('')
 const value = ref([])
 
+const dataStore = useDataStore()
+
+watch(dataStore.value, (newValue) => {
+  console.log('newValue :>> ', newValue)
+  task.value = dataStore.getCurrentItem()?.title || ''
+})
+
+const list = computed(() => dataStore.value)
+
 const handleAdd = () => {
   const uuid = crypto.randomUUID()
-  id.value = uuid
-  list.push({
-    title: task.value,
-    // component: EditorComponent,
-    uuid
-  })
-  saveToLocalStorage(list)
-  task.value = ''
-}
 
-const saveToLocalStorage = (data: Reactive<ListItem[]>) => {
-  localStorage.setItem('list', JSON.stringify(data))
+  dataStore.addData({
+    title: task.value,
+    editData: {},
+    id: uuid
+  })
+
+  task.value = ''
+  dataStore.setId(uuid)
+}
+const handleSwitch = (id: string) => {
+  dataStore.setId(id)
 }
 
 // const handleDelete = () => {
@@ -39,7 +39,6 @@ const saveToLocalStorage = (data: Reactive<ListItem[]>) => {
 <template>
   <div class="side-container">
     <div class="side-add">
-      <!-- <a-button type="primary" @click="handleAdd">新增</a-button> -->
       <a-input
         placeholder="添加任务至 工作任务 ，回车即可创建"
         v-model:value="task"
@@ -48,11 +47,11 @@ const saveToLocalStorage = (data: Reactive<ListItem[]>) => {
     </div>
     <div class="list-box">
       <template v-for="item in list">
-        <div class="list-item">
+        <div class="list-item" @click="handleSwitch(item.id)">
           <div class="content">
             <a-checkbox-group v-model:value="value" style="width: 100%">
               <div>
-                <a-checkbox :value="item.uuid" />
+                <a-checkbox :value="item.id" />
                 <a-input v-model:value="item.title" />
               </div>
             </a-checkbox-group>

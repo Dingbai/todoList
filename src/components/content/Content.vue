@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, watch, type Ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
 import EditorJS, { type OutputData } from '@editorjs/editorjs'
 import Header from '@editorjs/header'
 import List from '@editorjs/list'
@@ -13,48 +13,64 @@ const editData = ref<OutputData | null>(null)
 const dataStore = useDataStore()
 
 dataStore.$subscribe(() => {
-  const currentItem = dataStore.getCurrentItem()
+  const currentItem = dataStore.currentItem
   title.value = currentItem?.title || ''
   editData.value = currentItem?.editData || null
-  if (currentItem?.editData) {
-    editor.value?.render(
-      currentItem.editData
-      // blocks: currentItem?.editData?.blocks || []
-    )
-  }
+
+  editor.value
+    ?.render({
+      version: currentItem?.editData?.version,
+      time: currentItem?.editData?.time,
+      blocks: currentItem?.editData?.blocks || []
+    })
+    .then((res) => {
+      console.log('res :>> ', res)
+    })
+    .catch((err) => {
+      console.log('err :>> ', err)
+    })
 })
 
-watch(title, (newValue) => {
-  if (newValue.trim()) {
-    const data = { id: dataStore.id, title: newValue, editData: editData.value }
+const handleChange = (event: InputEvent) => {
+  const value = (event.target as HTMLInputElement).value
+  if (value.trim()) {
+    const data = { id: dataStore.id, title: value, editData: editData.value }
     dataStore.update(data)
   }
-})
+}
 
-onMounted(() => {
+const initializeEditor = () => {
+  const currentItem = dataStore.currentItem
+  const initValue = currentItem?.editData
+  title.value = currentItem?.title || ''
   editor.value = new EditorJS({
     holder: editorId,
+    placeholder: '在这里开始输入...',
     tools: {
       header: Header,
       list: List
       // image: ImageTool
     },
     data: {
-      ...editData.value,
-      blocks: editData.value?.blocks || []
+      ...initValue,
+      blocks: initValue?.blocks || []
     },
     onChange: async () => {
       const outputData = (await editor.value?.save()) || null
-      editData.value = outputData
       const data = { id: dataStore.id, title: title.value, editData: outputData }
+      editData.value = outputData
       dataStore.update(data)
     },
     onReady: () => {
-      if (editData.value) {
-        editor.value?.render(editData.value)
+      if (initValue) {
+        editor.value?.render(initValue)
       }
     }
   })
+}
+
+onMounted(() => {
+  initializeEditor()
 })
 
 onBeforeUnmount(() => {
@@ -65,7 +81,7 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div class="edit-container">
-    <a-input v-model:value="title" />
+    <a-input v-model:value="title" @change="handleChange" placeholder="准备做什么？" />
     <div id="editorjs-container" />
   </div>
 </template>

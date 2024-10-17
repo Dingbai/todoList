@@ -8,9 +8,8 @@ const value = ref([])
 
 const dataStore = useDataStore()
 
-watch(dataStore.value, (newValue) => {
-  console.log('newValue :>> ', newValue)
-  task.value = dataStore.getCurrentItem()?.title || ''
+watch(dataStore.value, () => {
+  task.value = dataStore.currentItem?.title || ''
 })
 
 const list = computed(() => dataStore.value)
@@ -20,7 +19,7 @@ const handleAdd = () => {
 
   dataStore.addData({
     title: task.value,
-    editData: {},
+    editData: null,
     id: uuid
   })
 

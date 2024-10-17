@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Content from './components/content/Content.vue'
 import SideBar from './components/sideBar/SideBar.vue'
 import { useDataStore } from '@/stores/update'
@@ -8,8 +8,16 @@ const isShowContent = ref(false)
 
 const dataStore = useDataStore()
 dataStore.$subscribe(() => {
-  dataStore.hasCurrentItem() && (isShowContent.value = true)
+  getContentStatus()
 })
+
+onMounted(() => {
+  getContentStatus()
+})
+
+const getContentStatus = () => {
+  dataStore.hasCurrentItem && (isShowContent.value = true)
+}
 </script>
 
 <template>

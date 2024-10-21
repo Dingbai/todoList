@@ -3,4 +3,5 @@ export interface Data {
   title: string
   editData: OutputData | null
   id: string
+  created: string
 }

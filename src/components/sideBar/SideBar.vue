@@ -1,16 +1,13 @@
 <script setup lang="ts">
 // import { DeleteOutlined } from '@ant-design/icons-vue'
-import { ref, watch, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useDataStore } from '@/stores/update'
+import moment from 'moment'
 
 const task = ref('')
 const value = ref([])
 
 const dataStore = useDataStore()
-
-watch(dataStore.value, () => {
-  task.value = dataStore.currentItem?.title || ''
-})
 
 const list = computed(() => dataStore.value)
 
@@ -20,7 +17,8 @@ const handleAdd = () => {
   dataStore.addData({
     title: task.value,
     editData: null,
-    id: uuid
+    id: uuid,
+    created: moment().format('YYYY-MM-DD HH:mm:ss')
   })
 
   task.value = ''
@@ -49,10 +47,14 @@ const handleSwitch = (id: string) => {
         <div class="list-item" @click="handleSwitch(item.id)">
           <div class="content">
             <a-checkbox-group v-model:value="value" style="width: 100%">
-              <div>
-                <a-checkbox :value="item.id" />
-                <a-input v-model:value="item.title" />
-              </div>
+              <a-row>
+                <a-col :span="2">
+                  <a-checkbox :value="item.id" />
+                </a-col>
+                <a-col :span="22">
+                  <a-input v-model:value="item.title" placeholder="无标题" />
+                </a-col>
+              </a-row>
             </a-checkbox-group>
           </div>
           <!-- <div class="handle">
@@ -84,15 +86,20 @@ const handleSwitch = (id: string) => {
       margin-bottom: 6px;
       :deep(.ant-input) {
         border: none;
+        padding-left: 0;
         &:focus {
           border: none;
           box-shadow: none;
         }
       }
+      :deep(.ant-checkbox-wrapper) {
+        padding-top: 4px;
+      }
 
       .content {
         display: flex;
         align-items: center;
+        width: 100%;
       }
     }
   }

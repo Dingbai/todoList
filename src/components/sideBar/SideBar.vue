@@ -6,6 +6,7 @@ import moment from 'moment'
 
 const task = ref('')
 const value = ref([])
+const currentId = ref('')
 
 const dataStore = useDataStore()
 
@@ -26,6 +27,11 @@ const handleAdd = () => {
 }
 const handleSwitch = (id: string) => {
   dataStore.setId(id)
+  currentId.value = id
+}
+
+const getActivedClass = (id: string) => {
+  return currentId.value === id ? 'bg-actived' : ''
 }
 
 // const handleDelete = () => {
@@ -44,7 +50,7 @@ const handleSwitch = (id: string) => {
     </div>
     <div class="list-box">
       <template v-for="item in list">
-        <div class="list-item" @click="handleSwitch(item.id)">
+        <div :class="`list-item ${getActivedClass(item.id)}`" @click="handleSwitch(item.id)">
           <div class="content">
             <a-checkbox-group v-model:value="value" style="width: 100%">
               <a-row>
@@ -52,7 +58,11 @@ const handleSwitch = (id: string) => {
                   <a-checkbox :value="item.id" />
                 </a-col>
                 <a-col :span="22">
-                  <a-input v-model:value="item.title" placeholder="无标题" />
+                  <a-input
+                    :class="`${getActivedClass(item.id)}`"
+                    v-model:value="item.title"
+                    placeholder="无标题"
+                  />
                 </a-col>
               </a-row>
             </a-checkbox-group>
@@ -84,6 +94,8 @@ const handleSwitch = (id: string) => {
     .list-item {
       display: flex;
       margin-bottom: 6px;
+      padding: 0 10px;
+      border-radius: 6px;
       :deep(.ant-input) {
         border: none;
         padding-left: 0;
@@ -101,6 +113,9 @@ const handleSwitch = (id: string) => {
         align-items: center;
         width: 100%;
       }
+    }
+    .bg-actived {
+      background: #f3f3f3;
     }
   }
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Content from './components/content/Content.vue'
-import sideContent from './components/sideContent/SideContent.vue'
+import Content from '@/components/content/Content.vue'
+import sideContent from '@/components/sideContent/sideContent.vue'
 import { useDataStore } from '@/stores/update'
 import { backupData } from './utils/backup'
 
@@ -20,28 +20,15 @@ onMounted(() => {
 const getContentStatus = () => {
   dataStore.hasCurrentItem && (isShowContent.value = true)
 }
+import SideBar from './sideBar/SideBar.vue'
 </script>
-
 <template>
-  <div class="app-container">
-    <sideContent />
-    <div class="content">
-      <Content v-show="isShowContent" />
-    </div>
+  <div class="layout-Container">
+    <SideBar />
+     
   </div>
 </template>
-<style>
-@import './assets/styles/reset.less';
-</style>
 <style lang="less" scoped>
-.app-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-
-  .content {
-    flex: 1;
-  }
+.layout-Container {
 }
 </style>

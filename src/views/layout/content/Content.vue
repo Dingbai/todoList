@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Content from './components/content/Content.vue'
-import sideContent from './components/sideContent/SideContent.vue'
+import Content from '@/components/content/Content.vue'
+import SideContent from '@/components/sideContent/SideContent.vue'
 import { useDataStore } from '@/stores/update'
-import { backupData } from './utils/backup'
+import { backupData } from '@/utils/backup'
 
 const isShowContent = ref(false)
 
@@ -23,8 +23,8 @@ const getContentStatus = () => {
 </script>
 
 <template>
-  <div class="app-container">
-    <sideContent />
+  <div class="content-container">
+    <SideContent />
     <div class="content">
       <Content v-show="isShowContent" />
     </div>
@@ -34,7 +34,7 @@ const getContentStatus = () => {
 @import './assets/styles/reset.less';
 </style>
 <style lang="less" scoped>
-.app-container {
+.content-container {
   display: flex;
   justify-content: center;
   align-items: center;

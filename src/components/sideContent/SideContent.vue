@@ -4,11 +4,10 @@ import { ref, computed } from 'vue'
 import { useDataStore } from '@/stores/update'
 import moment from 'moment'
 
+const dataStore = useDataStore()
 const task = ref('')
 const value = ref([])
-const currentId = ref('')
-
-const dataStore = useDataStore()
+const currentId = ref(dataStore.currentItem?.id || '')
 
 const list = computed(() => dataStore.value)
 

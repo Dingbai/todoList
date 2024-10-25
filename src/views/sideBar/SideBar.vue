@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { SettingFilled, QuestionCircleOutlined } from '@ant-design/icons-vue'
-const goPath = (sign: string) => {
-  console.log('sign :>> ', sign)
-  // const router = useRouter()
-  // router.push(sign)
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goPath = (path: string) => {
+  router.push(`/${path}`)
 }
 </script>
 <template>
   <div class="side-bar-container">
-    <div class="account">
+    <div class="account" @click="goPath('')">
       <img src="@/assets/images/avatar.jpeg" alt="" />
     </div>
     <div class="setting" @click="goPath('setting')">
@@ -27,6 +29,7 @@ const goPath = (sign: string) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-shrink: 0;
   .account {
     display: flex;
     justify-content: center;

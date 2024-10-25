@@ -30,9 +30,7 @@ const getContentStatus = () => {
     </div>
   </div>
 </template>
-<style>
-@import './assets/styles/reset.less';
-</style>
+
 <style lang="less" scoped>
 .content-container {
   display: flex;

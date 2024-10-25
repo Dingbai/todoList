@@ -23,6 +23,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideBar: typeof import('./src/components/sideContent/SideBar.vue')['default']
-    SideContent: typeof import('./src/components/sideContent/sideContent.vue')['default']
+    SideContent: typeof import('./src/components/sideContent/SideContent.vue')['default']
   }
 }

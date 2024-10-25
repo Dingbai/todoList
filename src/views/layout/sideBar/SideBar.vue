@@ -1,14 +1,46 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { SettingFilled, QuestionCircleOutlined } from '@ant-design/icons-vue'
+const goPath = (sign: string) => {
+  console.log('sign :>> ', sign)
+  // const router = useRouter()
+  // router.push(sign)
+}
+</script>
 <template>
   <div class="side-bar-container">
-    <div class="account"></div>
-    <div class="setting"></div>
-    <div class="about"></div>
+    <div class="account">
+      <img src="@/assets/images/avatar.jpeg" alt="" />
+    </div>
+    <div class="setting" @click="goPath('setting')">
+      <SettingFilled style="font-size: 22px" />
+    </div>
+    <div class="about" @click="goPath('about')">
+      <QuestionCircleOutlined style="font-size: 22px" />
+    </div>
   </div>
 </template>
 <style lang="less" scoped>
 .side-bar-container {
-  width: 80px;
+  width: 60px;
+  height: 100vh;
   background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .account {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    img {
+      width: 32px;
+      border-radius: 6px;
+    }
+  }
+  .setting {
+    margin-top: auto;
+  }
+  .about {
+    margin: 10px 0;
+  }
 }
 </style>

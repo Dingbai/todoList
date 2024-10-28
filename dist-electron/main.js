@@ -7,7 +7,7 @@ const path$1 = require$$1;
 const fs = require$$2.promises;
 const USER_DATA_PATH = app$1.getPath("userData");
 const BACKUP_FILE = path$1.join(USER_DATA_PATH, "localStorage-backup.json");
-function setupDataPersistence$1() {
+function setupDataPersistence$1(win) {
   ipcMain.handle("backup-local-storage", async (_event, data) => {
     try {
       await fs.writeFile(BACKUP_FILE, JSON.stringify(data));
@@ -28,6 +28,7 @@ function setupDataPersistence$1() {
       return { success: false, error: error.message };
     }
   });
+  win.webContents.send("backup-path", BACKUP_FILE);
 }
 var backup = setupDataPersistence$1;
 const { app, BrowserWindow, globalShortcut } = require$$0;
@@ -56,10 +57,11 @@ function createWindow() {
   } else {
     win.loadFile(path.join(__dirname, "../dist/index.html"));
   }
+  return win;
 }
 app.whenReady().then(async () => {
-  createWindow();
-  setupDataPersistence();
+  const win = createWindow();
+  setupDataPersistence(win);
   app.on("activate", function() {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

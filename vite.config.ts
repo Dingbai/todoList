@@ -7,7 +7,6 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import Components from 'unplugin-vue-components/vite'
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 import electron from 'vite-plugin-electron'
-import pkg from './package.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -26,9 +25,6 @@ export default defineConfig({
       entry: 'electron/main.cjs'
     })
   ],
-  define: {
-    APP_VERSION: pkg.version
-  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

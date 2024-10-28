@@ -6,4 +6,6 @@ export interface IElectronAPI {
     data?: Record<string, any>
     error?: string
   }>
+  // backupPath: string
+  getBackupPath: (path: string) => void
 }

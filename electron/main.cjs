@@ -28,11 +28,12 @@ function createWindow() {
   } else {
     win.loadFile(path.join(__dirname, '../dist/index.html'))
   }
+  return win
 }
 
 app.whenReady().then(async () => {
-  createWindow()
-  setupDataPersistence()
+  const win = createWindow()
+  setupDataPersistence(win)
   // await ensureConfigExists()
   // createTray()
   app.on('activate', function () {

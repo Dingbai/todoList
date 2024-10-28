@@ -1,4 +1,4 @@
-class LocalStorageManager {
+export class LocalStorageManager {
   static async backup() {
     const data = localStorage.list
     return await window.electronAPI.backupLocalStorage(data)
@@ -8,9 +8,8 @@ class LocalStorageManager {
     const result = await window.electronAPI.restoreLocalStorage()
     if (result.success && result.data) {
       localStorage.list = result.data
-      return true
     }
-    return false
+    return result
   }
 
   // 定期自动备份

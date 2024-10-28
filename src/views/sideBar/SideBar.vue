@@ -23,7 +23,7 @@ const goPath = (path: string) => {
 </template>
 <style lang="less" scoped>
 .side-bar-container {
-  width: 60px;
+  width: 50px;
   height: 100vh;
   background-color: #f9f9f9;
   display: flex;

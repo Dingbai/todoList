@@ -7,5 +7,5 @@ export interface IElectronAPI {
     error?: string
   }>
   // backupPath: string
-  getBackupPath: (path: string) => void
+  getBackupPath: () => Promise<string>
 }

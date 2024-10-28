@@ -39,6 +39,11 @@ export const useDataStore = defineStore('data', {
     setId(id: string) {
       //   this.$patch({ id })
       this.id = id
+    },
+    deleteData(id: string) {
+      const res = this.value.filter((item: Data) => item.id !== id)
+      localStorage.list = JSON.stringify(res)
+      this.$patch({ value: res })
     }
   }
 })

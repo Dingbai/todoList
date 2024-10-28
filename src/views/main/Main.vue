@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Content from '@/components/content/Content.vue'
 import SideContent from '@/components/sideContent/SideContent.vue'
 import { useDataStore } from '@/stores/update'
@@ -8,18 +8,25 @@ import { backupData } from '@/utils/backup'
 const isShowContent = ref(false)
 
 const dataStore = useDataStore()
-dataStore.$subscribe(() => {
-  getContentStatus()
-})
+// dataStore.$subscribe(() => {
+//   getContentStatus()
+// })
 
 onMounted(() => {
   backupData()
-  getContentStatus()
 })
 
-const getContentStatus = () => {
-  dataStore.hasCurrentItem && (isShowContent.value = true)
-}
+watch(
+  () => dataStore.value,
+  () => {
+    isShowContent.value = dataStore.hasCurrentItem
+  },
+  { immediate: true, deep: true }
+)
+
+// const getContentStatus = () => {
+//   dataStore.hasCurrentItem && (isShowContent.value = true)
+// }
 </script>
 
 <template>

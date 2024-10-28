@@ -14,6 +14,7 @@ declare module 'vue' {
     ACheckboxGroup: typeof import('ant-design-vue/es')['CheckboxGroup']
     ACol: typeof import('ant-design-vue/es')['Col']
     AInput: typeof import('ant-design-vue/es')['Input']
+    APopover: typeof import('ant-design-vue/es')['Popover']
     ARow: typeof import('ant-design-vue/es')['Row']
     Content: typeof import('./src/components/content/Content.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
@@ -23,7 +24,6 @@ declare module 'vue' {
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SideBar: typeof import('./src/components/sideContent/SideBar.vue')['default']
     SideContent: typeof import('./src/components/sideContent/SideContent.vue')['default']
   }
 }

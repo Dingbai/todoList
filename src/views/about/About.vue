@@ -6,6 +6,7 @@ const version: string = pkg.version
 <template>
   <div class="about-container">
     <div class="version">
+      <h1>about</h1>
       <span>版本号：</span>
       <span>{{ version }}</span>
     </div>

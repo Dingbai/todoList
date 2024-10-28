@@ -3,10 +3,12 @@ import SideBar from '@/views/sideBar/SideBar.vue'
 </script>
 
 <template>
-  <a-app class="app-container">
-    <SideBar />
-    <router-view />
-  </a-app>
+  <Suspense>
+    <a-app class="app-container">
+      <SideBar />
+      <router-view />
+    </a-app>
+  </Suspense>
 </template>
 <style>
 @import '@/assets/styles/reset.less';

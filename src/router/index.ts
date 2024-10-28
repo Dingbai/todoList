@@ -9,8 +9,8 @@ const router = createRouter({
       children: [
         {
           path: '/',
-          name: 'content',
-          component: () => import('@/views/content/Content.vue')
+          name: 'main',
+          component: () => import('@/views/main/Main.vue')
         },
         {
           path: '/setting',

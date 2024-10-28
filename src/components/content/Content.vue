@@ -13,12 +13,6 @@ const title = ref('')
 const editData = ref<OutputData | null>(null)
 const dataStore = useDataStore()
 
-dataStore.$subscribe(() => {
-  const currentItem = dataStore.currentItem
-  title.value = currentItem?.title || ''
-  editData.value = currentItem?.editData || null
-})
-
 watch(
   () => dataStore.id,
   () => {
@@ -33,6 +27,15 @@ watch(
         console.log('err :>> ', err)
       })
   }
+)
+
+watch(
+  () => dataStore.currentItem,
+  (data) => {
+    title.value = data?.title || ''
+    editData.value = data?.editData || null
+  },
+  { immediate: true, deep: true }
 )
 
 const handleChange = (event: InputEvent) => {

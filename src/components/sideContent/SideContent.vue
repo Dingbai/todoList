@@ -33,9 +33,10 @@ const getActivedClass = (id: string) => {
   return currentId.value === id ? 'bg-actived' : ''
 }
 
-// const handleDelete = () => {
-//   console.log('删除')
-// }
+const handleDelete = (id: string) => {
+  dataStore.deleteData(id)
+  dataStore.setId(dataStore.value[0].id)
+}
 </script>
 
 <template>
@@ -49,26 +50,29 @@ const getActivedClass = (id: string) => {
     </div>
     <div class="list-box">
       <template v-for="item in list">
-        <div :class="`list-item ${getActivedClass(item.id)}`" @click="handleSwitch(item.id)">
+        <div :class="`list-item ${getActivedClass(item.id)}`">
           <div class="content">
-            <a-checkbox-group v-model:value="value" style="width: 100%">
-              <a-row>
-                <a-col :span="2">
-                  <a-checkbox :value="item.id" />
-                </a-col>
-                <a-col :span="22">
-                  <a-input
-                    :class="`${getActivedClass(item.id)}`"
-                    v-model:value="item.title"
-                    placeholder="无标题"
-                  />
-                </a-col>
-              </a-row>
-            </a-checkbox-group>
+            <a-popover placement="rightTop" trigger="contextmenu" class="custom-popover">
+              <template #content>
+                <p @click="handleDelete(item.id)">delete</p>
+              </template>
+              <a-checkbox-group v-model:value="value" style="width: 100%">
+                <a-row>
+                  <a-col :span="2">
+                    <a-checkbox :value="item.id" />
+                  </a-col>
+                  <a-col :span="22">
+                    <a-input
+                      :class="`${getActivedClass(item.id)}`"
+                      v-model:value="item.title"
+                      placeholder="无标题"
+                      @focus="handleSwitch(item.id)"
+                    />
+                  </a-col>
+                </a-row>
+              </a-checkbox-group>
+            </a-popover>
           </div>
-          <!-- <div class="handle">
-            <DeleteOutlined @click="handleDelete" />
-          </div> -->
         </div>
       </template>
     </div>
@@ -118,4 +122,16 @@ const getActivedClass = (id: string) => {
     }
   }
 }
+// .custom-popover {
+//   :deep(.ant-popover-inner) {
+//     width: 100px;
+//     p {
+//       text-align: left;
+//       padding: 10px;
+//       :hover {
+//         background: #f3f3f3;
+//       }
+//     }
+//   }
+// }
 </style>

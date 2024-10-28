@@ -7,7 +7,7 @@ const USER_DATA_PATH = app.getPath('userData')
 const BACKUP_FILE = path.join(USER_DATA_PATH, 'localStorage-backup.json')
 
 // 在主进程中设置数据备份和恢复的handlers
-function setupDataPersistence(win) {
+function setupDataPersistence() {
   // 处理数据备份请求
   ipcMain.handle('backup-local-storage', async (_event, data) => {
     try {
@@ -32,13 +32,10 @@ function setupDataPersistence(win) {
     }
   })
 
-  // 发送备份路径到渲染进程
-  win.webContents.send('backup-path', BACKUP_FILE)
-
-  // ipcMain.on('message-to-main', (event) => {
-  //   // _event.sender.send('backup-path', BACKUP_FILE)
-  //   event.reply('backup-path', BACKUP_FILE)
-  // })
+  // 获取备份路径
+  ipcMain.handle('get-backup-path', async () => {
+    return BACKUP_FILE
+  })
 }
 
 module.exports = setupDataPersistence

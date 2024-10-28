@@ -11,8 +11,8 @@ app.on('window-all-closed', () => {
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 800,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
@@ -28,12 +28,11 @@ function createWindow() {
   } else {
     win.loadFile(path.join(__dirname, '../dist/index.html'))
   }
-  return win
 }
 
 app.whenReady().then(async () => {
-  const win = createWindow()
-  setupDataPersistence(win)
+  createWindow()
+  setupDataPersistence()
   // await ensureConfigExists()
   // createTray()
   app.on('activate', function () {

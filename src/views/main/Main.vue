@@ -30,7 +30,7 @@ watch(
 </script>
 
 <template>
-  <div class="content-container">
+  <div class="main-container">
     <SideContent />
     <div class="content">
       <Content v-show="isShowContent" />
@@ -39,11 +39,12 @@ watch(
 </template>
 
 <style lang="less" scoped>
-.content-container {
+.main-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  flex: 1;
 
   .content {
     flex: 1;

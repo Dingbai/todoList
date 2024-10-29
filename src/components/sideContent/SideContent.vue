@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// import { DeleteOutlined } from '@ant-design/icons-vue'
 import { ref, computed } from 'vue'
 import { useDataStore } from '@/stores/update'
 import moment from 'moment'
@@ -23,6 +22,7 @@ const handleAdd = () => {
 
   task.value = ''
   dataStore.setId(uuid)
+  currentId.value = uuid
 }
 const handleSwitch = (id: string) => {
   dataStore.setId(id)

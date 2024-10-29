@@ -3,9 +3,16 @@ import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import EditorJS, { type OutputData } from '@editorjs/editorjs'
 import Header from '@editorjs/header'
 import List from '@editorjs/list'
+import Code from '@editorjs/code'
+import Table from '@editorjs/table'
+import Quote from '@editorjs/quote'
+import CheckList from '@editorjs/checklist'
+import Marker from '@editorjs/marker'
+import Paragraph from '@editorjs/paragraph'
+import SimpleImage from '@editorjs/simple-image'
+import TextVariantTune from '@editorjs/text-variant-tune'
 import { useDataStore } from '@/stores/update'
 import { type Data } from '@/types/index.d'
-import ImageTool from '@editorjs/image'
 
 const editor = ref<EditorJS | null>(null)
 const editorId = 'editorjs-container'
@@ -55,7 +62,20 @@ const initializeEditor = () => {
     tools: {
       header: Header,
       list: List,
-      image: ImageTool
+      checklist: {
+        class: CheckList,
+        inlineToolbar: true
+      },
+      code: Code,
+      marker: Marker,
+      paragraph: {
+        class: Paragraph,
+        inlineToolbar: true
+      },
+      quote: Quote,
+      simpleImage: SimpleImage,
+      table: Table,
+      textVariantTune: TextVariantTune
     },
     data: {
       ...initValue,
@@ -109,7 +129,7 @@ onBeforeUnmount(() => {
     }
   }
   #editorjs-container {
-    max-height: calc(100vh - 60px);
+    height: calc(100vh - 60px);
     padding: 0 11px;
     box-sizing: border-box;
     overflow: auto;

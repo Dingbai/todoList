@@ -29,9 +29,6 @@ importers:
       '@editorjs/marker':
         specifier: ^1.4.0
         version: 1.4.0
-      '@editorjs/paragraph':
-        specifier: ^2.11.6
-        version: 2.11.6
       '@editorjs/quote':
         specifier: ^2.7.2
         version: 2.7.2

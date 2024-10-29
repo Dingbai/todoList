@@ -37,6 +37,7 @@ const handleDelete = (id: string) => {
   dataStore.deleteData(id)
   dataStore.setId(dataStore.value[0].id)
 }
+const getPopupContainer = () => document.querySelector('.content')
 </script>
 
 <template>
@@ -48,11 +49,16 @@ const handleDelete = (id: string) => {
         @keyup.enter="handleAdd"
       />
     </div>
-    <div class="list-box">
+    <div class="list-box-doing">
       <template v-for="item in list">
         <div :class="`list-item ${getActivedClass(item.id)}`">
           <div class="content">
-            <a-popover placement="rightTop" trigger="contextmenu" class="custom-popover">
+            <a-popover
+              placement="rightTop"
+              trigger="contextmenu"
+              class="custom-popover"
+              :getPopupContainer="getPopupContainer"
+            >
               <template #content>
                 <p @click="handleDelete(item.id)">delete</p>
               </template>
@@ -92,7 +98,7 @@ const handleDelete = (id: string) => {
       margin: 10px auto;
     }
   }
-  .list-box {
+  .list-box-doing {
     padding-top: 10px;
     .list-item {
       display: flex;
@@ -115,6 +121,18 @@ const handleDelete = (id: string) => {
         display: flex;
         align-items: center;
         width: 100%;
+        :deep(.ant-popover-inner) {
+          width: 100px;
+          padding: 0;
+          p {
+            text-align: left;
+            padding: 10px;
+            cursor: pointer;
+            &:hover {
+              background: #f3f3f3;
+            }
+          }
+        }
       }
     }
     .bg-actived {
@@ -122,16 +140,4 @@ const handleDelete = (id: string) => {
     }
   }
 }
-// .custom-popover {
-//   :deep(.ant-popover-inner) {
-//     width: 100px;
-//     p {
-//       text-align: left;
-//       padding: 10px;
-//       :hover {
-//         background: #f3f3f3;
-//       }
-//     }
-//   }
-// }
 </style>

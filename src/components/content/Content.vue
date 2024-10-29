@@ -8,7 +8,6 @@ import Table from '@editorjs/table'
 import Quote from '@editorjs/quote'
 import CheckList from '@editorjs/checklist'
 import Marker from '@editorjs/marker'
-import Paragraph from '@editorjs/paragraph'
 import SimpleImage from '@editorjs/simple-image'
 import TextVariantTune from '@editorjs/text-variant-tune'
 import { useDataStore } from '@/stores/update'
@@ -68,14 +67,15 @@ const initializeEditor = () => {
       },
       code: Code,
       marker: Marker,
+      textVariant: TextVariantTune,
       paragraph: {
-        class: Paragraph,
-        inlineToolbar: true
+        // class: Paragraph,
+        inlineToolbar: true,
+        tunes: ['textVariant']
       },
       quote: Quote,
       simpleImage: SimpleImage,
-      table: Table,
-      textVariantTune: TextVariantTune
+      table: Table
     },
     data: {
       ...initValue,

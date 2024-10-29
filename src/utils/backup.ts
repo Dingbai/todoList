@@ -26,7 +26,7 @@ export class LocalStorageManager {
 export function backupData() {
   document.addEventListener('DOMContentLoaded', async () => {
     // 应用启动时恢复数据
-    await LocalStorageManager.restore()
+    // await LocalStorageManager.restore()
 
     // 启动自动备份
     LocalStorageManager.startAutoBackup()

@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useDataStore } from '@/stores/update'
+import CheckboxItem from '@/components/sideContent/checkboxItem/CheckboxItem.vue'
 import moment from 'moment'
 
 const dataStore = useDataStore()
 const task = ref('')
-const value = ref([])
 const currentId = ref(dataStore.currentItem?.id || '')
 
-const list = computed(() => dataStore.value)
+const activeKey = ref(['1'])
+
+watch(activeKey, (val) => {
+  console.log(val)
+})
 
 const handleAdd = () => {
   const uuid = crypto.randomUUID()
@@ -17,6 +21,7 @@ const handleAdd = () => {
     title: task.value,
     editData: null,
     id: uuid,
+    status: 'doing',
     created: moment().format('YYYY-MM-DD HH:mm:ss')
   })
 
@@ -24,20 +29,6 @@ const handleAdd = () => {
   dataStore.setId(uuid)
   currentId.value = uuid
 }
-const handleSwitch = (id: string) => {
-  dataStore.setId(id)
-  currentId.value = id
-}
-
-const getActivedClass = (id: string) => {
-  return currentId.value === id ? 'bg-actived' : ''
-}
-
-const handleDelete = (id: string) => {
-  dataStore.deleteData(id)
-  dataStore.setId(dataStore.value[0].id)
-}
-const getPopupContainer = () => document.querySelector('.content')
 </script>
 
 <template>
@@ -49,39 +40,14 @@ const getPopupContainer = () => document.querySelector('.content')
         @keyup.enter="handleAdd"
       />
     </div>
-    <div class="list-box-doing">
-      <template v-for="item in list">
-        <div :class="`list-item ${getActivedClass(item.id)}`">
-          <div class="content">
-            <a-popover
-              placement="rightTop"
-              trigger="contextmenu"
-              class="custom-popover"
-              :getPopupContainer="getPopupContainer"
-            >
-              <template #content>
-                <p @click="handleDelete(item.id)">delete</p>
-              </template>
-              <a-checkbox-group v-model:value="value" style="width: 100%">
-                <a-row>
-                  <a-col :span="2">
-                    <a-checkbox :value="item.id" />
-                  </a-col>
-                  <a-col :span="22">
-                    <a-input
-                      :class="`${getActivedClass(item.id)}`"
-                      v-model:value="item.title"
-                      placeholder="无标题"
-                      @focus="handleSwitch(item.id)"
-                    />
-                  </a-col>
-                </a-row>
-              </a-checkbox-group>
-            </a-popover>
-          </div>
-        </div>
-      </template>
-    </div>
+    <a-collapse v-model:activeKey="activeKey" ghost>
+      <a-collapse-panel key="1" header="正在进行">
+        <CheckboxItem status="doing" />
+      </a-collapse-panel>
+      <a-collapse-panel key="2" header="已完成">
+        <CheckboxItem status="done"/>
+      </a-collapse-panel>
+    </a-collapse>
   </div>
 </template>
 
@@ -98,45 +64,12 @@ const getPopupContainer = () => document.querySelector('.content')
       margin: 10px auto;
     }
   }
-  .list-box-doing {
-    padding-top: 10px;
-    .list-item {
-      display: flex;
-      margin-bottom: 6px;
-      padding: 0 10px;
-      border-radius: 6px;
-      :deep(.ant-input) {
-        border: none;
-        padding-left: 0;
-        &:focus {
-          border: none;
-          box-shadow: none;
-        }
-      }
-      :deep(.ant-checkbox-wrapper) {
-        padding-top: 4px;
-      }
-
-      .content {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        :deep(.ant-popover-inner) {
-          width: 100px;
-          padding: 0;
-          p {
-            text-align: left;
-            padding: 10px;
-            cursor: pointer;
-            &:hover {
-              background: #f3f3f3;
-            }
-          }
-        }
-      }
+  :deep(.ant-collapse-item) {
+    .ant-collapse-header {
+      padding-left: 0;
     }
-    .bg-actived {
-      background: #f3f3f3;
+    .ant-collapse-content-box {
+      padding-top: 0;
     }
   }
 }

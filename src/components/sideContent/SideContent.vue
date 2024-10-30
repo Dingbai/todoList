@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useDataStore } from '@/stores/update'
 import CheckboxItem from '@/components/sideContent/checkboxItem/CheckboxItem.vue'
 import moment from 'moment'
@@ -9,10 +9,18 @@ const task = ref('')
 const currentId = ref(dataStore.currentItem?.id || '')
 
 const activeKey = ref(['1'])
-
-watch(activeKey, (val) => {
-  console.log(val)
-})
+const panelData = [
+  {
+    key: '1',
+    title: '正在进行',
+    status: 'doing'
+  },
+  {
+    key: '2',
+    title: '已完成',
+    status: 'done'
+  }
+]
 
 const handleAdd = () => {
   const uuid = crypto.randomUUID()
@@ -22,12 +30,17 @@ const handleAdd = () => {
     editData: null,
     id: uuid,
     status: 'doing',
+    actived: false,
     created: moment().format('YYYY-MM-DD HH:mm:ss')
   })
 
   task.value = ''
   dataStore.setId(uuid)
   currentId.value = uuid
+}
+
+const getCount = (status: string) => {
+  return dataStore.value.filter((item) => item.status === status).length
 }
 </script>
 
@@ -41,11 +54,14 @@ const handleAdd = () => {
       />
     </div>
     <a-collapse v-model:activeKey="activeKey" ghost>
-      <a-collapse-panel key="1" header="正在进行">
-        <CheckboxItem status="doing" />
-      </a-collapse-panel>
-      <a-collapse-panel key="2" header="已完成">
-        <CheckboxItem status="done"/>
+      <a-collapse-panel v-for="item in panelData" :key="item.key">
+        <template #header>
+          <span>
+            {{ item.title }}
+            <span class="header">{{ getCount(item.status) }}</span>
+          </span>
+        </template>
+        <CheckboxItem :status="item.status" />
       </a-collapse-panel>
     </a-collapse>
   </div>
@@ -70,6 +86,11 @@ const handleAdd = () => {
     }
     .ant-collapse-content-box {
       padding-top: 0;
+    }
+    .header {
+      color: #bdbdbd;
+      font-size: 12px;
+      margin-left: 2px;
     }
   }
 }

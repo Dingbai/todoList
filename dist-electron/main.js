@@ -15,7 +15,7 @@ function setupDataPersistence$1() {
       return { success: true };
     } catch (error) {
       console.error("备份失败:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.message, message: "数据备份成功" };
     }
   });
   ipcMain.handle("restore-local-storage", async () => {
@@ -25,27 +25,27 @@ function setupDataPersistence$1() {
       return { success: true, data: JSON.parse(data) };
     } catch (error) {
       console.error("恢复失败:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.message, message: "数据恢复成功" };
     }
   });
   ipcMain.handle("get-backup-path", async () => {
     return BACKUP_FILE;
   });
-  ipcMain.handle("upload-file", async (formData) => {
-    const object = {};
-    console.log("formData :>> ", formData);
-    formData.forEach((value, key) => {
-      if (object[key] !== void 0) {
-        if (!Array.isArray(object[key])) {
-          object[key] = [object[key]];
-        }
-        object[key].push(value);
-      } else {
-        object[key] = value;
-      }
-    });
-    console.log("object :>> ", object);
-    return { success: true, data: object };
+  ipcMain.handle("upload-file", async (_event, path2) => {
+    try {
+      const fileContent = await fs.readFile(path2, "utf8");
+      const jsonData = JSON.parse(fileContent);
+      return {
+        success: true,
+        data: jsonData,
+        message: "File uploaded successfully"
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
   });
 }
 var backup = setupDataPersistence$1;

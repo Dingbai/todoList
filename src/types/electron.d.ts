@@ -1,6 +1,7 @@
 interface ReturnValue {
   success: boolean
   data?: Record<string, any>
+  message: string
   error?: string
 }
 export interface IElectronAPI {
@@ -9,5 +10,5 @@ export interface IElectronAPI {
   restoreLocalStorage: () => Promise<ReturnValue>
   // backupPath: string
   getBackupPath: () => Promise<string>
-  uploadFile: (formData: FormData) => Promise<ReturnValue>
+  uploadFile: (file: string) => Promise<ReturnValue>
 }

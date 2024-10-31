@@ -16,8 +16,8 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "electron:dev": "vite --mode=development",
-    "electron:inspect": "vite --mode=development --inspect=9229",
     "electron:build": "vite build && electron-builder",
+    "debug:main": "electron --inspect-brk=9229 ./electron/main.cjs",
     "build:win": "vite build && electron-builder --win --x64"
   },
   "dependencies": {

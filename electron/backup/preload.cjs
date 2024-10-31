@@ -4,5 +4,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   backupLocalStorage: (data) => ipcRenderer.invoke('backup-local-storage', data),
   restoreLocalStorage: () => ipcRenderer.invoke('restore-local-storage'),
   getBackupPath: () => ipcRenderer.invoke('get-backup-path'),
-  uploadFile: () => ipcRenderer.invoke('upload-file', formData)
+  uploadFile: (path) => ipcRenderer.invoke('upload-file', path)
 })

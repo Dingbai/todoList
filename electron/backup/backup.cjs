@@ -16,7 +16,7 @@ function setupDataPersistence() {
       return { success: true }
     } catch (error) {
       console.error('备份失败:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error.message, message: '数据备份成功' }
     }
   })
 
@@ -28,7 +28,7 @@ function setupDataPersistence() {
       return { success: true, data: JSON.parse(data) }
     } catch (error) {
       console.error('恢复失败:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error.message, message: '数据恢复成功' }
     }
   })
 
@@ -37,25 +37,23 @@ function setupDataPersistence() {
     return BACKUP_FILE
   })
   // 处理文件上传请求
-  ipcMain.handle('upload-file', async (formData) => {
-    // 上传文件的逻辑
-    const object = {}
+  ipcMain.handle('upload-file', async (_event, path) => {
+    try {
+      const fileContent = await fs.readFile(path, 'utf8')
 
-    console.log('formData :>> ', formData)
-    formData.forEach((value, key) => {
-      // 处理数组形式的字段
-      if (object[key] !== undefined) {
-        if (!Array.isArray(object[key])) {
-          object[key] = [object[key]]
-        }
-        object[key].push(value)
-      } else {
-        object[key] = value
+      const jsonData = JSON.parse(fileContent)
+
+      return {
+        success: true,
+        data: jsonData,
+        message: 'File uploaded successfully'
       }
-    })
-    console.log('object :>> ', object)
-
-    return { success: true, data: object }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      }
+    }
   })
 }
 

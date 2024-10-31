@@ -8,6 +8,7 @@ import { LocalStorageManager } from '@/utils/backup'
 const { message } = App.useApp()
 
 const fileList = ref([])
+const data = ref<Record<string, string>>({})
 const handleChange = (info: UploadChangeParam) => {
   const status = info.file.status
   if (status !== 'uploading') {
@@ -25,17 +26,15 @@ async function handleCustomRequest({
   onSuccess,
   onError
 }: {
-  file: File
+  file: { path: string }
   onSuccess: (data: any) => void
   onError: (error: any) => void
 }) {
-  console.log('file :>> ', file)
-  const formData = new FormData()
-  formData.append('file', file)
   try {
-    const res = await window.electronAPI.uploadFile(formData)
-    console.log('res :>> ', res)
+    const res = await window.electronAPI.uploadFile(file.path)
+
     if (res.success) {
+      data.value = res.data || {}
       onSuccess(res.data)
     } else {
       onError(res.data)

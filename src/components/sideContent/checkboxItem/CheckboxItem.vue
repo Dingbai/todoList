@@ -19,10 +19,16 @@ const list = computed(() => dataStore.value.filter((item) => item.status === pro
 const handleSwitch = (id: string) => {
   dataStore.setId(id)
   currentId.value = id
+  // 标记选中状态
+  const temp = dataStore.value.map((item) => {
+    item.selected = item.id === id
+    return item
+  })
+  dataStore.updateAllData(temp)
 }
 
 const getActivedClass = (id: string) => {
-  return currentId.value === id ? 'bg-actived' : ''
+  return dataStore.currentItem?.id === id ? 'bg-actived' : ''
 }
 
 const getStatusClass = () => {

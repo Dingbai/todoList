@@ -19,6 +19,7 @@ declare module 'vue' {
     AInput: typeof import('ant-design-vue/es')['Input']
     APopover: typeof import('ant-design-vue/es')['Popover']
     ARow: typeof import('ant-design-vue/es')['Row']
+    AUploadDragger: typeof import('ant-design-vue/es')['UploadDragger']
     CheckboxItem: typeof import('./src/components/sideContent/checkboxItem/CheckboxItem.vue')['default']
     Content: typeof import('./src/components/content/Content.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']

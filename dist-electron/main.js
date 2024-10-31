@@ -31,6 +31,22 @@ function setupDataPersistence$1() {
   ipcMain.handle("get-backup-path", async () => {
     return BACKUP_FILE;
   });
+  ipcMain.handle("upload-file", async (formData) => {
+    const object = {};
+    console.log("formData :>> ", formData);
+    formData.forEach((value, key) => {
+      if (object[key] !== void 0) {
+        if (!Array.isArray(object[key])) {
+          object[key] = [object[key]];
+        }
+        object[key].push(value);
+      } else {
+        object[key] = value;
+      }
+    });
+    console.log("object :>> ", object);
+    return { success: true, data: object };
+  });
 }
 var backup = setupDataPersistence$1;
 const { app, BrowserWindow, globalShortcut } = require$$0;

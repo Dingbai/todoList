@@ -36,6 +36,27 @@ function setupDataPersistence() {
   ipcMain.handle('get-backup-path', async () => {
     return BACKUP_FILE
   })
+  // 处理文件上传请求
+  ipcMain.handle('upload-file', async (formData) => {
+    // 上传文件的逻辑
+    const object = {}
+
+    console.log('formData :>> ', formData)
+    formData.forEach((value, key) => {
+      // 处理数组形式的字段
+      if (object[key] !== undefined) {
+        if (!Array.isArray(object[key])) {
+          object[key] = [object[key]]
+        }
+        object[key].push(value)
+      } else {
+        object[key] = value
+      }
+    })
+    console.log('object :>> ', object)
+
+    return { success: true, data: object }
+  })
 }
 
 module.exports = setupDataPersistence

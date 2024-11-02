@@ -6,12 +6,16 @@ import {
   InfoCircleOutlined,
   PaperClipOutlined,
   EyeOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  CopyOutlined
 } from '@ant-design/icons-vue'
 import { type OutputData } from '@editorjs/editorjs'
 
 import { LocalStorageManager } from '@/utils/backup'
-import Editor from '@/components/editor/Editor.vue'
+import { JsonViewer } from 'vue3-json-viewer'
+import ClipboardJS from 'clipboard'
+
+import 'vue3-json-viewer/dist/index.css'
 import type { ReturnValue } from '@/types/electron'
 import { useDataStore } from '@/stores/update'
 import type { Data } from '@/types/index.d'
@@ -112,6 +116,15 @@ const handleDelete = () => {
   fileList.value = []
   data.value = ''
 }
+const copy = (text: string) => {
+  const clipboard = new ClipboardJS('.copy', {
+    text: () => text
+  })
+  clipboard.on('success', () => {
+    clipboard.destroy()
+    message.success('复制成功')
+  })
+}
 </script>
 <template>
   <div class="setting-container">
@@ -123,7 +136,9 @@ const handleDelete = () => {
             数据备份
             <a-popover placement="bottomLeft">
               <template #content>
-                <div>备份路径：{{ backupPath }}</div>
+                <div>
+                  备份路径：{{ backupPath }}<CopyOutlined class="copy" @click="copy(backupPath)" />
+                </div>
               </template>
               <InfoCircleOutlined />
             </a-popover>
@@ -184,7 +199,15 @@ const handleDelete = () => {
           <a-button @click="close">取消</a-button>
         </a-space>
       </template>
-      <Editor :data="previewData" :config="{ readOnly: true }" />
+      <JsonViewer
+        :value="JSON.parse(data)"
+        copyable
+        boxed
+        sort
+        theme="jv-dark"
+        :expandDepth="2"
+        expanded
+      />
     </a-modal>
   </div>
 </template>
@@ -211,6 +234,7 @@ const handleDelete = () => {
         margin-left: 5px;
       }
     }
+
     :deep(.ant-list) {
       margin-top: 10px;
       .custom-item {
@@ -234,5 +258,9 @@ const handleDelete = () => {
       height: initial;
     }
   }
+}
+:deep(.anticon-copy) {
+  margin-left: 5px;
+  cursor: pointer;
 }
 </style>

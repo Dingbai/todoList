@@ -33,6 +33,7 @@
     "@editorjs/table": "^2.4.2",
     "@editorjs/text-variant-tune": "^1.0.3",
     "ant-design-vue": "4.x",
+    "clipboard": "^2.0.11",
     "editorjs-button": "^3.0.3",
     "editorjs-drag-drop": "^1.1.16",
     "editorjs-go": "github:micheleriva/editorjs-go",
@@ -42,7 +43,8 @@
     "react-editor-js": "^2.1.0",
     "uuid": "^10.0.0",
     "vue": "^3.4.34",
-    "vue-router": "^4.4.0"
+    "vue-router": "^4.4.0",
+    "vue3-json-viewer": "^2.2.2"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.10.3",

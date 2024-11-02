@@ -8,9 +8,6 @@ import { backupData } from '@/utils/backup'
 const isShowContent = ref(false)
 
 const dataStore = useDataStore()
-// dataStore.$subscribe(() => {
-//   getContentStatus()
-// })
 
 onMounted(() => {
   backupData()
@@ -23,10 +20,6 @@ watch(
   },
   { immediate: true, deep: true }
 )
-
-// const getContentStatus = () => {
-//   dataStore.hasCurrentItem && (isShowContent.value = true)
-// }
 </script>
 
 <template>

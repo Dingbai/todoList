@@ -15,6 +15,12 @@ const props = defineProps({
   data: {
     type: Object as PropType<OutputData>,
     required: true
+  },
+  config: {
+    type: Object as PropType<EditorJS.EditorConfig>,
+    default: () => ({
+      readOnly: false
+    })
   }
 })
 const emit = defineEmits(['change', 'getEditorInstance'])
@@ -25,6 +31,8 @@ const editorId = 'editorjs-container'
 const initializeEditor = () => {
   editor.value = new EditorJS({
     holder: editorId,
+    readOnly: props.config.readOnly,
+    inlineToolbar: ['link', 'marker', 'bold', 'italic'],
     tools: {
       header: Header,
       list: List,
@@ -78,10 +86,10 @@ onBeforeUnmount(() => {
 </template>
 <style lang="less" scoped>
 #editorjs-container {
-  height: calc(100vh - 60px);
-  padding: 0 11px;
-  box-sizing: border-box;
-  overflow: auto;
+  // // height: calc(100vh - 60px);
+  // // padding: 0 11px;
+  // box-sizing: border-box;
+  // overflow: auto;
   :deep(.codex-editor__redactor) {
     padding-bottom: 0 !important;
   }

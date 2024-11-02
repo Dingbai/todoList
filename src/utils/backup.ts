@@ -1,16 +1,16 @@
 export class LocalStorageManager {
   static async backup() {
-    const data = localStorage.list
+    const data = JSON.stringify(localStorage.list || {})
     return await window.electronAPI.backupLocalStorage(data)
   }
 
-  static async restore() {
-    const result = await window.electronAPI.restoreLocalStorage()
-    if (result.success && result.data) {
-      localStorage.list = result.data
-    }
-    return result
-  }
+  // static async restore() {
+  //   const result = await window.electronAPI.restoreLocalStorage()
+  //   if (result.success && result.data) {
+  //     localStorage.list = result.data
+  //   }
+  //   return result
+  // }
 
   // 定期自动备份
   static startAutoBackup(intervalMinutes = 5) {

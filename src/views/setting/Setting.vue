@@ -1,26 +1,36 @@
 <script lang="ts" setup>
 import { App, type UploadChangeParam } from 'ant-design-vue'
 import { ref } from 'vue'
-import { InboxOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
+import {
+  InboxOutlined,
+  InfoCircleOutlined,
+  PaperClipOutlined,
+  EyeOutlined,
+  DeleteOutlined
+} from '@ant-design/icons-vue'
+import { type OutputData } from '@editorjs/editorjs'
 
 import { LocalStorageManager } from '@/utils/backup'
+import Editor from '@/components/editor/Editor.vue'
+import type { ReturnValue } from '@/types/electron'
+import { useDataStore } from '@/stores/update'
+import type { Data } from '@/types/index.d'
 
 const { message } = App.useApp()
+const dataStore = useDataStore()
 
 const fileList = ref([])
-const data = ref<Record<string, string>>({})
+const data = ref('')
+const visible = ref(false)
+const previewData = ref<OutputData>({ blocks: [] })
+
 const handleChange = (info: UploadChangeParam) => {
-  const status = info.file.status
-  if (status !== 'uploading') {
-    console.log(info.file, info.fileList)
-  }
-  if (status === 'done') {
-    message.success(`${info.file.name} file uploaded successfully.`)
-  } else if (status === 'error') {
-    message.error(`${info.file.name} file upload failed.`)
+  const isJson = info.file.type === 'application/json'
+  if (!isJson) {
+    message.error('You can only upload JSON file!')
+    fileList.value = []
   }
 }
-
 async function handleCustomRequest({
   file,
   onSuccess,
@@ -34,7 +44,16 @@ async function handleCustomRequest({
     const res = await window.electronAPI.uploadFile(file.path)
 
     if (res.success) {
-      data.value = res.data || {}
+      const blocks = [
+        {
+          type: 'code',
+          data: {
+            code: res.data ? res.data : {}
+          }
+        }
+      ]
+      previewData.value = { blocks }
+      data.value = res.data ? res.data : ''
       onSuccess(res.data)
     } else {
       onError(res.data)
@@ -44,36 +63,55 @@ async function handleCustomRequest({
   }
 }
 
-function handleDrop(e: DragEvent) {
-  console.log(e)
-}
 const backupPath = await window.electronAPI.getBackupPath()
 
-const backup = () => {
-  LocalStorageManager.backup()
-    .then((res) => {
-      if (res.success) {
-        message.success('备份成功')
-      }
-    })
-    .catch((err) => {
-      message.error(`备份失败,${err}`)
-    })
+const backup = async (): Promise<ReturnValue> => {
+  return new Promise((resolve, reject) => {
+    LocalStorageManager.backup()
+      .then((res) => {
+        if (res.success) {
+          message.success('备份成功')
+          resolve(res)
+        } else {
+          message.error(`备份失败,${res.message}`)
+          reject(res.message)
+        }
+      })
+      .catch((err) => {
+        message.error(`备份失败,${err}`)
+        reject(err)
+      })
+  })
 }
-const handlePreview = (file: File) => {
-  console.log(file)
+const handlePreview = () => {
+  visible.value = true
 }
-// const restore = () => {
-//   LocalStorageManager.restore()
-//     .then((res) => {
-//       if (res.success) {
-//         message.success('恢复成功')
-//       }
-//     })
-//     .catch((err) => {
-//       message.error(`恢复失败,${err}`)
-//     })
-// }
+const handleOk = () => {
+  visible.value = false
+}
+const restore = async () => {
+  const res = await backup()
+  if (res.success) {
+    const temp = JSON.parse(data.value)
+    localStorage.list = temp
+    dataStore.updateAllData(temp)
+    const id = temp.filter((item: Data) => item.status === 'doing')?.[0]?.id
+    if (id) {
+      dataStore.setId(id)
+    }
+    message.success('恢复成功')
+  } else {
+    message.error(`恢复失败,${res.message}`)
+  }
+  close()
+}
+const close = () => {
+  visible.value = false
+}
+const handleDelete = () => {
+  fileList.value = []
+  data.value = ''
+}
 </script>
 <template>
   <div class="setting-container">
@@ -81,7 +119,7 @@ const handlePreview = (file: File) => {
       <h1>setting</h1>
       <a-row>
         <a-col :span="3">
-          <div class="backup">
+          <div class="backup label">
             数据备份
             <a-popover placement="bottomLeft">
               <template #content>
@@ -97,7 +135,7 @@ const handlePreview = (file: File) => {
       </a-row>
       <a-row>
         <a-col :span="3">
-          <div>数据恢复</div>
+          <div class="label">数据恢复</div>
         </a-col>
         <a-col :span="10">
           <a-upload-dragger
@@ -106,21 +144,48 @@ const handlePreview = (file: File) => {
             :multiple="false"
             :customRequest="handleCustomRequest"
             :disabled="fileList.length > 0"
+            :show-upload-list="false"
             @change="handleChange"
-            @drop="handleDrop"
-            @preview="handlePreview"
           >
             <p class="ant-upload-drag-icon">
-              <inbox-outlined></inbox-outlined>
+              <inbox-outlined />
             </p>
             <p class="ant-upload-text">点击或拖动文件到该区域上传</p>
             <p class="ant-upload-hint">仅支持单个json文件上传</p>
           </a-upload-dragger>
+          <div class="file-list">
+            <a-list v-if="fileList.length > 0" :dataSource="fileList">
+              <template #renderItem="{ item }">
+                <a-list-item class="custom-item">
+                  <PaperClipOutlined />
+                  <span>{{ item.name }}</span>
+                  <a-space>
+                    <EyeOutlined @click="handlePreview" />
+                    <DeleteOutlined @click="handleDelete" />
+                  </a-space>
+                </a-list-item>
+              </template>
+            </a-list>
+          </div>
         </a-col>
       </a-row>
-      <!-- <a-button type="primary">备份</a-button>
-      <a-button type="primary" @click="restore">恢复</a-button> -->
     </div>
+    <a-modal v-model:open="visible" title="数据预览/恢复" @ok="handleOk" centered>
+      <template #footer>
+        <a-space>
+          <a-popconfirm
+            title="该操作会覆盖当前数据，是否继续？"
+            ok-text="确定"
+            cancel-text="取消"
+            @confirm="restore"
+          >
+            <a-button type="primary">恢复</a-button>
+          </a-popconfirm>
+          <a-button @click="close">取消</a-button>
+        </a-space>
+      </template>
+      <Editor :data="previewData" :config="{ readOnly: true }" />
+    </a-modal>
   </div>
 </template>
 <style lang="less" scoped>
@@ -133,7 +198,7 @@ const handlePreview = (file: File) => {
     :deep(.ant-row) {
       margin-top: 10px;
       .ant-col {
-        > div {
+        > .label {
           display: flex;
           justify-content: flex-end;
           padding-right: 8px;
@@ -145,6 +210,28 @@ const handlePreview = (file: File) => {
       :deep(.anticon-info-circle) {
         margin-left: 5px;
       }
+    }
+    :deep(.ant-list) {
+      margin-top: 10px;
+      .custom-item {
+        padding: 10px;
+        display: flex;
+        justify-content: flex-start;
+        border-radius: 6px;
+        .anticon-paper-clip {
+          margin-right: 5px;
+        }
+        .ant-space {
+          margin-left: auto;
+          cursor: pointer;
+        }
+        &:hover {
+          background-color: #f5f5f5;
+        }
+      }
+    }
+    :deep(.ant-upload-drag) {
+      height: initial;
     }
   }
 }

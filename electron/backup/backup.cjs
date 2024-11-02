@@ -16,19 +16,7 @@ function setupDataPersistence() {
       return { success: true }
     } catch (error) {
       console.error('备份失败:', error)
-      return { success: false, error: error.message, message: '数据备份成功' }
-    }
-  })
-
-  // 处理数据恢复请求
-  ipcMain.handle('restore-local-storage', async () => {
-    try {
-      const data = await fs.readFile(BACKUP_FILE, 'utf8')
-      console.log('恢复成功')
-      return { success: true, data: JSON.parse(data) }
-    } catch (error) {
-      console.error('恢复失败:', error)
-      return { success: false, error: error.message, message: '数据恢复成功' }
+      return { success: false, message: `数据备份失败,${error.message}` }
     }
   })
 
@@ -51,7 +39,7 @@ function setupDataPersistence() {
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        message: `Failed to upload file: ${error.message}`
       }
     }
   })

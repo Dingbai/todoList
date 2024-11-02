@@ -6,9 +6,9 @@ interface ReturnValue {
 }
 export interface IElectronAPI {
   // 基础数据操作
-  backupLocalStorage: (data: Record<string, any>) => Promise<ReturnValue>
-  restoreLocalStorage: () => Promise<ReturnValue>
+  backupLocalStorage: (data: string) => Promise<ReturnValue>
+  // restoreLocalStorage: () => Promise<ReturnValue>
   // backupPath: string
   getBackupPath: () => Promise<string>
-  uploadFile: (file: string) => Promise<ReturnValue>
+  uploadFile: (file: string) => Promise<ReturnValue & { data: string }>
 }

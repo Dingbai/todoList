@@ -21,6 +21,7 @@ declare module 'vue' {
     AUploadDragger: typeof import('ant-design-vue/es')['UploadDragger']
     CheckboxItem: typeof import('./src/components/sideContent/checkboxItem/CheckboxItem.vue')['default']
     Content: typeof import('./src/components/content/Content.vue')['default']
+    Editor: typeof import('./src/components/editor/Editor.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']

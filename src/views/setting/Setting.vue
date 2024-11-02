@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { App, type UploadChangeParam } from 'ant-design-vue'
 import { ref } from 'vue'
-import { InboxOutlined } from '@ant-design/icons-vue'
+import { InboxOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
 
 import { LocalStorageManager } from '@/utils/backup'
 
@@ -60,50 +60,92 @@ const backup = () => {
       message.error(`备份失败,${err}`)
     })
 }
-const restore = () => {
-  LocalStorageManager.restore()
-    .then((res) => {
-      if (res.success) {
-        message.success('恢复成功')
-      }
-    })
-    .catch((err) => {
-      message.error(`恢复失败,${err}`)
-    })
+const handlePreview = (file: File) => {
+  console.log(file)
 }
+// const restore = () => {
+//   LocalStorageManager.restore()
+//     .then((res) => {
+//       if (res.success) {
+//         message.success('恢复成功')
+//       }
+//     })
+//     .catch((err) => {
+//       message.error(`恢复失败,${err}`)
+//     })
+// }
 </script>
 <template>
   <div class="setting-container">
     <div class="setting-content">
       <h1>setting</h1>
-      <a-button type="primary" @click="backup">备份</a-button>
-      <a-button type="primary" @click="restore">恢复</a-button>
-      <div class="path">备份路径: {{ backupPath }}</div>
-      <a-upload-dragger
-        v-model:fileList="fileList"
-        name="file"
-        :multiple="false"
-        :customRequest="handleCustomRequest"
-        @change="handleChange"
-        @drop="handleDrop"
-      >
-        <p class="ant-upload-drag-icon">
-          <inbox-outlined></inbox-outlined>
-        </p>
-        <p class="ant-upload-text">Click or drag file to this area to upload</p>
-        <p class="ant-upload-hint">
-          Support for a single or bulk upload. Strictly prohibit from uploading company data or
-          other band files
-        </p>
-      </a-upload-dragger>
+      <a-row>
+        <a-col :span="3">
+          <div class="backup">
+            数据备份
+            <a-popover placement="bottomLeft">
+              <template #content>
+                <div>备份路径：{{ backupPath }}</div>
+              </template>
+              <InfoCircleOutlined />
+            </a-popover>
+          </div>
+        </a-col>
+        <a-col :span="10">
+          <a-button type="primary" @click="backup">备份</a-button>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="3">
+          <div>数据恢复</div>
+        </a-col>
+        <a-col :span="10">
+          <a-upload-dragger
+            v-model:fileList="fileList"
+            name="file"
+            :multiple="false"
+            :customRequest="handleCustomRequest"
+            :disabled="fileList.length > 0"
+            @change="handleChange"
+            @drop="handleDrop"
+            @preview="handlePreview"
+          >
+            <p class="ant-upload-drag-icon">
+              <inbox-outlined></inbox-outlined>
+            </p>
+            <p class="ant-upload-text">点击或拖动文件到该区域上传</p>
+            <p class="ant-upload-hint">仅支持单个json文件上传</p>
+          </a-upload-dragger>
+        </a-col>
+      </a-row>
+      <!-- <a-button type="primary">备份</a-button>
+      <a-button type="primary" @click="restore">恢复</a-button> -->
     </div>
   </div>
 </template>
 <style lang="less" scoped>
 .setting-container {
   padding: 0 10px;
-  .path {
-    color: rgba(0, 0, 0, 0.88);
+  width: 100%;
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 16px;
+  .setting-content {
+    :deep(.ant-row) {
+      margin-top: 10px;
+      .ant-col {
+        > div {
+          display: flex;
+          justify-content: flex-end;
+          padding-right: 8px;
+        }
+      }
+    }
+    .backup {
+      align-items: center;
+      :deep(.anticon-info-circle) {
+        margin-left: 5px;
+      }
+    }
   }
 }
 </style>

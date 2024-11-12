@@ -10,7 +10,7 @@ const goPath = (path: string) => {
 </script>
 <template>
   <div class="side-bar-container">
-    <div class="account" @click="goPath('')">
+    <div class="account" @click="goPath('main')">
       <img src="@/assets/images/avatar.jpeg" alt="" />
     </div>
     <div class="setting" @click="goPath('setting')">

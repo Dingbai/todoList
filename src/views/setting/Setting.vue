@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { App, type UploadChangeParam } from 'ant-design-vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import {
   InboxOutlined,
   InfoCircleOutlined,
@@ -27,6 +27,7 @@ const fileList = ref([])
 const data = ref('')
 const visible = ref(false)
 const previewData = ref<OutputData>({ blocks: [] })
+const checked = ref(false)
 
 const handleChange = (info: UploadChangeParam) => {
   const isJson = info.file.type === 'application/json'
@@ -35,6 +36,21 @@ const handleChange = (info: UploadChangeParam) => {
     fileList.value = []
   }
 }
+onMounted(() => {
+  checked.value = window.electronAPI.getAutoLaunch()
+})
+
+function handleSwitchChange(checked: boolean) {
+  try {
+    const res = window.electronAPI.setAutoLaunch(checked)
+    res.success ? message.success(res.message) : message.error(res.message)
+  } catch (err: unknown) {
+    console.log('err :>> ', err)
+    message.error(String(err))
+  }
+  // window.electronAPI.setAutoLaunch(checked)
+}
+
 async function handleCustomRequest({
   file,
   onSuccess,
@@ -132,6 +148,14 @@ const copy = (text: string) => {
       <h1>setting</h1>
       <a-row>
         <a-col :span="3">
+          <div class="label">开机自启动</div>
+        </a-col>
+        <a-col :span="10">
+          <a-switch v-model:checked="checked" @change="handleSwitchChange" />
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="3">
           <div class="backup label">
             数据备份
             <a-popover placement="bottomLeft">
@@ -200,13 +224,13 @@ const copy = (text: string) => {
         </a-space>
       </template>
       <JsonViewer
-        :value="JSON.parse(data)"
         copyable
         boxed
         sort
         theme="jv-dark"
-        :expandDepth="2"
         expanded
+        :value="JSON.parse(data)"
+        :expandDepth="2"
       />
     </a-modal>
   </div>

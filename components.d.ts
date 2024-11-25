@@ -8,7 +8,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AApp: typeof import('ant-design-vue/es')['App']
+    ABadge: typeof import('ant-design-vue/es')['Badge']
     AButton: typeof import('ant-design-vue/es')['Button']
+    ACalendar: typeof import('ant-design-vue/es')['Calendar']
     Account: typeof import('./src/components/account/account.vue')['default']
     ACheckbox: typeof import('ant-design-vue/es')['Checkbox']
     ACol: typeof import('ant-design-vue/es')['Col']
@@ -23,6 +25,7 @@ declare module 'vue' {
     APopover: typeof import('ant-design-vue/es')['Popover']
     ARow: typeof import('ant-design-vue/es')['Row']
     ASpace: typeof import('ant-design-vue/es')['Space']
+    ASwitch: typeof import('ant-design-vue/es')['Switch']
     AUploadDragger: typeof import('ant-design-vue/es')['UploadDragger']
     CheckboxItem: typeof import('./src/components/sideContent/checkboxItem/CheckboxItem.vue')['default']
     Content: typeof import('./src/components/content/Content.vue')['default']

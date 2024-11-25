@@ -7,7 +7,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 获取备份路径
   getBackupPath: () => ipcRenderer.invoke('get-backup-path'),
   // 上传文件给 node 解析
-  uploadFile: (path) => ipcRenderer.invoke('upload-file', path)
+  uploadFile: (path) => ipcRenderer.invoke('upload-file', path),
+  // 设置开机自启动
+  setAutoLaunch: (flag) => ipcRenderer.invoke('set-auto-launch', flag),
+  // 获取自启动状态
+  getAutoLaunch: () => ipcRenderer.invoke('get-auto-launch')
 })
 
 // // 设置一个标志，确保代码只执行一次

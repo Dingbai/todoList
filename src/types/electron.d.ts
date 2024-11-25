@@ -5,7 +5,6 @@ interface ReturnValue {
   error?: string
 }
 export interface IElectronAPI {
-  // 基础数据操作
   /**
    * 备份 localStorage
    * @param data
@@ -19,16 +18,21 @@ export interface IElectronAPI {
    * @returns {Promise<ReturnValue & { data: string }>}
    */
   getBackupPath: () => Promise<string>
+  /**
+   * 上传文件给 node 解析
+   * @param {string} path 本地文件路径
+   * @returns
+   */
   uploadFile: (file: string) => Promise<ReturnValue & { data: string }>
   /**
    * 设置自动启动
    * @param isAutoLaunch
    * @returns
    */
-  setAutoLaunch: (isAutoLaunch: boolean) => ReturnValue
+  toggleAutoLaunch: (state: boolean) => Promise<ReturnValue>
   /**
    * 获取自启动状态
    * @returns {boolean}
    */
-  getAutoLaunch: () => boolean
+  getAutoLaunchState: () => boolean
 }

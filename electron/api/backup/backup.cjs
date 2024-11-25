@@ -1,4 +1,3 @@
-const { message } = require('ant-design-vue')
 const { app, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs').promises
@@ -8,7 +7,7 @@ const USER_DATA_PATH = app.getPath('userData')
 const BACKUP_FILE = path.join(USER_DATA_PATH, 'localStorage-backup.json')
 
 // 在主进程中设置数据备份和恢复的handlers
-function setupDataPersistence() {
+function setupDataPersistenceApi() {
   // 处理数据备份请求
   ipcMain.handle('backup-local-storage', async (_event, data) => {
     try {
@@ -46,4 +45,4 @@ function setupDataPersistence() {
   })
 }
 
-module.exports = setupDataPersistence
+module.exports = setupDataPersistenceApi

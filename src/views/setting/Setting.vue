@@ -37,13 +37,17 @@ const handleChange = (info: UploadChangeParam) => {
   }
 }
 onMounted(() => {
-  checked.value = window.electronAPI.getAutoLaunch()
+  checked.value = window.electronAPI.getAutoLaunchState()
 })
 
-function handleSwitchChange(checked: boolean) {
+async function handleSwitchChange(checked: boolean) {
   try {
-    const res = window.electronAPI.setAutoLaunch(checked)
-    res.success ? message.success(res.message) : message.error(res.message)
+    const res = await window.electronAPI.toggleAutoLaunch(checked)
+    if (res.success) {
+      message.success(res.message)
+    } else {
+      message.error(res.message)
+    }
   } catch (err: unknown) {
     console.log('err :>> ', err)
     message.error(String(err))

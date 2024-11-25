@@ -1,6 +1,6 @@
-const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
-const setupDataPersistence = require('./backup/backup.cjs')
-const handleSystem = require('./backup/system.cjs')
+const { app, BrowserWindow, globalShortcut } = require('electron')
+const setupDataPersistenceApi = require('./api/backup/backup.cjs')
+const AutoLaunchManagerApi = require('./api/autoLaunchManager/autoLaunchManager.cjs')
 const path = require('path')
 
 // 防止应用退出
@@ -27,7 +27,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
-      preload: path.join(__dirname, 'backup/preload.cjs')
+      preload: path.join(__dirname, 'api/preload.cjs')
     },
     webContents: {
       openDevTools: true
@@ -74,8 +74,8 @@ function createWindow() {
 
 app.whenReady().then(async () => {
   createWindow()
-  setupDataPersistence()
-  handleSystem()
+  setupDataPersistenceApi()
+  AutoLaunchManagerApi()
   // await ensureConfigExists()
   // createTray()
   app.on('activate', function () {

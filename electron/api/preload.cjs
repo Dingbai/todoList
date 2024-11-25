@@ -1,17 +1,34 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // 备份 localStorage
+  /**
+   * 备份 localStorage
+   * @param {Data} data
+   * @returns
+   */
   backupLocalStorage: (data) => ipcRenderer.invoke('backup-local-storage', data),
   // restoreLocalStorage: (data) => ipcRenderer.invoke('restore-local-storage', data),
-  // 获取备份路径
+  /**
+   * 获取备份路径
+   * @returns {Promise<string>} 备份路径
+   */
   getBackupPath: () => ipcRenderer.invoke('get-backup-path'),
-  // 上传文件给 node 解析
+  /**
+   * 上传文件给 node 解析
+   * @param {string} path 本地文件路径
+   * @returns
+   */
   uploadFile: (path) => ipcRenderer.invoke('upload-file', path),
-  // 设置开机自启动
-  setAutoLaunch: (flag) => ipcRenderer.invoke('set-auto-launch', flag),
-  // 获取自启动状态
-  getAutoLaunch: () => ipcRenderer.invoke('get-auto-launch')
+  /**
+   * 切换自启动状态
+   * @returns {Promise<ReturnValue>} 是否自启动
+   */
+  toggleAutoLaunch: (state) => ipcRenderer.invoke('toggle-auto-launch', state),
+  /**
+   * 获取自启动状态
+   * @returns boolean
+   */
+  getAutoLaunchState: () => ipcRenderer.invoke('get-auto-launch-state')
 })
 
 // // 设置一个标志，确保代码只执行一次

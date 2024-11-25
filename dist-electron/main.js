@@ -1,1155 +1,749 @@
-import require$$0$1 from "electron";
-import require$$1 from "path";
-import require$$0 from "fs";
-import require$$0$2 from "util";
-import require$$2 from "child_process";
-import require$$0$3 from "os";
-var main = {};
-const { app: app$2, ipcMain: ipcMain$1 } = require$$0$1;
-const path$1 = require$$1;
-const fs = require$$0.promises;
-const USER_DATA_PATH = app$2.getPath("userData");
-const BACKUP_FILE = path$1.join(USER_DATA_PATH, "localStorage-backup.json");
-function setupDataPersistenceApi$1() {
-  ipcMain$1.handle("backup-local-storage", async (_event, data) => {
+import B from "electron";
+import K from "path";
+import j from "fs";
+import He from "util";
+import be from "child_process";
+import Ce from "os";
+var ft = {};
+const { app: Fe, ipcMain: V } = B, $e = K, fe = j.promises, Me = Fe.getPath("userData"), pe = $e.join(Me, "localStorage-backup.json");
+function Ie() {
+  V.handle("backup-local-storage", async (t, r) => {
     try {
-      await fs.writeFile(BACKUP_FILE, JSON.stringify(data));
-      console.log("备份成功");
-      return { success: true, message: "数据备份成功" };
-    } catch (error) {
-      console.error("备份失败:", error);
-      return { success: false, message: `数据备份失败,${error.message}` };
+      return await fe.writeFile(pe, JSON.stringify(r)), console.log("备份成功"), { success: !0, message: "数据备份成功" };
+    } catch (a) {
+      return console.error("备份失败:", a), { success: !1, message: `数据备份失败,${a.message}` };
     }
-  });
-  ipcMain$1.handle("get-backup-path", async () => {
-    return BACKUP_FILE;
-  });
-  ipcMain$1.handle("upload-file", async (_event, path2) => {
+  }), V.handle("get-backup-path", async () => pe), V.handle("upload-file", async (t, r) => {
     try {
-      const fileContent = await fs.readFile(path2, "utf8");
-      const jsonData = JSON.parse(fileContent);
+      const a = await fe.readFile(r, "utf8");
       return {
-        success: true,
-        data: jsonData,
+        success: !0,
+        data: JSON.parse(a),
         message: "File uploaded successfully"
       };
-    } catch (error) {
+    } catch (a) {
       return {
-        success: false,
-        message: `Failed to upload file: ${error.message}`
+        success: !1,
+        message: `Failed to upload file: ${a.message}`
       };
     }
   });
 }
-var backup = setupDataPersistenceApi$1;
-var pathIsAbsolute = { exports: {} };
-function posix(path2) {
-  return path2.charAt(0) === "/";
+var qe = Ie, Z = { exports: {} };
+function Le(t) {
+  return t.charAt(0) === "/";
 }
-function win32(path2) {
-  var splitDeviceRe = /^([a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?([\\\/])?([\s\S]*?)$/;
-  var result = splitDeviceRe.exec(path2);
-  var device = result[1] || "";
-  var isUnc = Boolean(device && device.charAt(1) !== ":");
-  return Boolean(result[2] || isUnc);
+function De(t) {
+  var r = /^([a-zA-Z]:|[\\\/]{2}[^\\\/]+[\\\/]+[^\\\/]+)?([\\\/])?([\s\S]*?)$/, a = r.exec(t), i = a[1] || "", n = !!(i && i.charAt(1) !== ":");
+  return !!(a[2] || n);
 }
-pathIsAbsolute.exports = process.platform === "win32" ? win32 : posix;
-pathIsAbsolute.exports.posix = posix;
-pathIsAbsolute.exports.win32 = win32;
-var pathIsAbsoluteExports = pathIsAbsolute.exports;
-var registry;
-var hasRequiredRegistry;
-function requireRegistry() {
-  if (hasRequiredRegistry) return registry;
-  hasRequiredRegistry = 1;
-  var util = require$$0$2, path2 = require$$1, spawn = require$$2.spawn, HKLM = "HKLM", HKCU = "HKCU", HKCR = "HKCR", HKU = "HKU", HKCC = "HKCC", HIVES = [HKLM, HKCU, HKCR, HKU, HKCC], REG_SZ = "REG_SZ", REG_MULTI_SZ = "REG_MULTI_SZ", REG_EXPAND_SZ = "REG_EXPAND_SZ", REG_DWORD = "REG_DWORD", REG_QWORD = "REG_QWORD", REG_BINARY = "REG_BINARY", REG_NONE = "REG_NONE", REG_TYPES = [REG_SZ, REG_MULTI_SZ, REG_EXPAND_SZ, REG_DWORD, REG_QWORD, REG_BINARY, REG_NONE], DEFAULT_VALUE = "", KEY_PATTERN = /(\\[a-zA-Z0-9_\s]+)*/, PATH_PATTERN = /^(HKEY_LOCAL_MACHINE|HKEY_CURRENT_USER|HKEY_CLASSES_ROOT|HKEY_USERS|HKEY_CURRENT_CONFIG)(.*)$/, ITEM_PATTERN = /^(.*)\s(REG_SZ|REG_MULTI_SZ|REG_EXPAND_SZ|REG_DWORD|REG_QWORD|REG_BINARY|REG_NONE)\s+([^\s].*)$/;
-  function ProcessUncleanExitError(message, code) {
-    if (!(this instanceof ProcessUncleanExitError))
-      return new ProcessUncleanExitError(message, code);
-    Error.captureStackTrace(this, ProcessUncleanExitError);
-    this.__defineGetter__("name", function() {
-      return ProcessUncleanExitError.name;
-    });
-    this.__defineGetter__("message", function() {
-      return message;
-    });
-    this.__defineGetter__("code", function() {
-      return code;
+Z.exports = process.platform === "win32" ? De : Le;
+Z.exports.posix = Le;
+Z.exports.win32 = De;
+var Ke = Z.exports, Q, he;
+function Ye() {
+  if (he) return Q;
+  he = 1;
+  var t = He, r = K, a = be.spawn, i = "HKLM", n = "HKCU", e = "HKCR", s = "HKU", o = "HKCC", d = [i, n, e, s, o], _ = "REG_SZ", y = "REG_MULTI_SZ", w = "REG_EXPAND_SZ", R = "REG_DWORD", b = "REG_QWORD", U = "REG_BINARY", ae = "REG_NONE", oe = [_, y, w, R, b, U, ae], Ge = "", ke = /(\\[a-zA-Z0-9_\s]+)*/, Oe = /^(HKEY_LOCAL_MACHINE|HKEY_CURRENT_USER|HKEY_CLASSES_ROOT|HKEY_USERS|HKEY_CURRENT_CONFIG)(.*)$/, ue = /^(.*)\s(REG_SZ|REG_MULTI_SZ|REG_EXPAND_SZ|REG_DWORD|REG_QWORD|REG_BINARY|REG_NONE)\s+([^\s].*)$/;
+  function F(E, u) {
+    if (!(this instanceof F))
+      return new F(E, u);
+    Error.captureStackTrace(this, F), this.__defineGetter__("name", function() {
+      return F.name;
+    }), this.__defineGetter__("message", function() {
+      return E;
+    }), this.__defineGetter__("code", function() {
+      return u;
     });
   }
-  util.inherits(ProcessUncleanExitError, Error);
-  function captureOutput(child) {
-    var output = { "stdout": "", "stderr": "" };
-    child.stdout.on("data", function(data) {
-      output["stdout"] += data.toString();
-    });
-    child.stderr.on("data", function(data) {
-      output["stderr"] += data.toString();
-    });
-    return output;
+  t.inherits(F, Error);
+  function T(E) {
+    var u = { stdout: "", stderr: "" };
+    return E.stdout.on("data", function(l) {
+      u.stdout += l.toString();
+    }), E.stderr.on("data", function(l) {
+      u.stderr += l.toString();
+    }), u;
   }
-  function mkErrorMsg(registryCommand, code, output) {
-    var stdout = output["stdout"].trim();
-    var stderr = output["stderr"].trim();
-    var msg = util.format("%s command exited with code %d:\n%s\n%s", registryCommand, code, stdout, stderr);
-    return new ProcessUncleanExitError(msg, code);
+  function G(E, u, l) {
+    var c = l.stdout.trim(), p = l.stderr.trim(), h = t.format(`%s command exited with code %d:
+%s
+%s`, E, u, c, p);
+    return new F(h, u);
   }
-  function convertArchString(archString) {
-    if (archString == "x64") {
+  function Ue(E) {
+    if (E == "x64")
       return "64";
-    } else if (archString == "x86") {
+    if (E == "x86")
       return "32";
-    } else {
-      throw new Error("illegal architecture: " + archString + " (use x86 or x64)");
-    }
+    throw new Error("illegal architecture: " + E + " (use x86 or x64)");
   }
-  function pushArch(args, arch) {
-    if (arch) {
-      args.push("/reg:" + convertArchString(arch));
-    }
+  function k(E, u) {
+    u && E.push("/reg:" + Ue(u));
   }
-  function getRegExePath() {
-    if (process.platform === "win32") {
-      return path2.join(process.env.windir, "system32", "reg.exe");
-    } else {
-      return "REG";
-    }
+  function O() {
+    return process.platform === "win32" ? r.join(process.env.windir, "system32", "reg.exe") : "REG";
   }
-  function RegistryItem(host, hive, key, name, type, value, arch) {
-    if (!(this instanceof RegistryItem))
-      return new RegistryItem(host, hive, key, name, type, value, arch);
-    var _host = host, _hive = hive, _key = key, _name = name, _type = type, _value = value, _arch = arch;
+  function M(E, u, l, c, p, h, f) {
+    if (!(this instanceof M))
+      return new M(E, u, l, c, p, h, f);
+    var A = E, g = u, m = l, L = c, P = p, D = h, x = f;
     this.__defineGetter__("host", function() {
-      return _host;
-    });
-    this.__defineGetter__("hive", function() {
-      return _hive;
-    });
-    this.__defineGetter__("key", function() {
-      return _key;
-    });
-    this.__defineGetter__("name", function() {
-      return _name;
-    });
-    this.__defineGetter__("type", function() {
-      return _type;
-    });
-    this.__defineGetter__("value", function() {
-      return _value;
-    });
-    this.__defineGetter__("arch", function() {
-      return _arch;
+      return A;
+    }), this.__defineGetter__("hive", function() {
+      return g;
+    }), this.__defineGetter__("key", function() {
+      return m;
+    }), this.__defineGetter__("name", function() {
+      return L;
+    }), this.__defineGetter__("type", function() {
+      return P;
+    }), this.__defineGetter__("value", function() {
+      return D;
+    }), this.__defineGetter__("arch", function() {
+      return x;
     });
   }
-  util.inherits(RegistryItem, Object);
-  function Registry(options) {
-    if (!(this instanceof Registry))
-      return new Registry(options);
-    var _options = options || {}, _host = "" + (_options.host || ""), _hive = "" + (_options.hive || HKLM), _key = "" + (_options.key || ""), _arch = _options.arch || null;
-    this.__defineGetter__("host", function() {
-      return _host;
-    });
-    this.__defineGetter__("hive", function() {
-      return _hive;
-    });
-    this.__defineGetter__("key", function() {
-      return _key;
-    });
-    this.__defineGetter__("path", function() {
-      return (_host.length == 0 ? "" : "\\\\" + _host + "\\") + _hive + _key;
-    });
-    this.__defineGetter__("arch", function() {
-      return _arch;
-    });
-    this.__defineGetter__("parent", function() {
-      var i = _key.lastIndexOf("\\");
-      return new Registry({
+  t.inherits(M, Object);
+  function v(E) {
+    if (!(this instanceof v))
+      return new v(E);
+    var u = E || {}, l = "" + (u.host || ""), c = "" + (u.hive || i), p = "" + (u.key || ""), h = u.arch || null;
+    if (this.__defineGetter__("host", function() {
+      return l;
+    }), this.__defineGetter__("hive", function() {
+      return c;
+    }), this.__defineGetter__("key", function() {
+      return p;
+    }), this.__defineGetter__("path", function() {
+      return (l.length == 0 ? "" : "\\\\" + l + "\\") + c + p;
+    }), this.__defineGetter__("arch", function() {
+      return h;
+    }), this.__defineGetter__("parent", function() {
+      var f = p.lastIndexOf("\\");
+      return new v({
         host: this.host,
         hive: this.hive,
-        key: i == -1 ? "" : _key.substring(0, i),
+        key: f == -1 ? "" : p.substring(0, f),
         arch: this.arch
       });
-    });
-    if (HIVES.indexOf(_hive) == -1)
+    }), d.indexOf(c) == -1)
       throw new Error("illegal hive specified.");
-    if (!KEY_PATTERN.test(_key))
+    if (!ke.test(p))
       throw new Error("illegal key specified.");
-    if (_arch && _arch != "x64" && _arch != "x86")
+    if (h && h != "x64" && h != "x86")
       throw new Error("illegal architecture specified (use x86 or x64)");
   }
-  Registry.HKLM = HKLM;
-  Registry.HKCU = HKCU;
-  Registry.HKCR = HKCR;
-  Registry.HKU = HKU;
-  Registry.HKCC = HKCC;
-  Registry.HIVES = HIVES;
-  Registry.REG_SZ = REG_SZ;
-  Registry.REG_MULTI_SZ = REG_MULTI_SZ;
-  Registry.REG_EXPAND_SZ = REG_EXPAND_SZ;
-  Registry.REG_DWORD = REG_DWORD;
-  Registry.REG_QWORD = REG_QWORD;
-  Registry.REG_BINARY = REG_BINARY;
-  Registry.REG_NONE = REG_NONE;
-  Registry.REG_TYPES = REG_TYPES;
-  Registry.DEFAULT_VALUE = DEFAULT_VALUE;
-  Registry.prototype.values = function values(cb) {
-    if (typeof cb !== "function")
+  return v.HKLM = i, v.HKCU = n, v.HKCR = e, v.HKU = s, v.HKCC = o, v.HIVES = d, v.REG_SZ = _, v.REG_MULTI_SZ = y, v.REG_EXPAND_SZ = w, v.REG_DWORD = R, v.REG_QWORD = b, v.REG_BINARY = U, v.REG_NONE = ae, v.REG_TYPES = oe, v.DEFAULT_VALUE = Ge, v.prototype.values = function(u) {
+    if (typeof u != "function")
       throw new TypeError("must specify a callback");
-    var args = ["QUERY", this.path];
-    pushArch(args, this.arch);
-    var proc = spawn(getRegExePath(), args, {
+    var l = ["QUERY", this.path];
+    k(l, this.arch);
+    var c = a(O(), l, {
       cwd: void 0,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"]
-    }), buffer = "", self = this, error = null;
-    var output = captureOutput(proc);
-    proc.on("close", function(code) {
-      if (error) {
-        return;
-      } else if (code !== 0) {
-        cb(mkErrorMsg("QUERY", code, output), null);
-      } else {
-        var items = [], result = [], lines = buffer.split("\n"), lineNumber = 0;
-        for (var i = 0, l = lines.length; i < l; i++) {
-          var line = lines[i].trim();
-          if (line.length > 0) {
-            if (lineNumber != 0) {
-              items.push(line);
-            }
-            ++lineNumber;
+    }), p = "", h = this, f = null, A = T(c);
+    return c.on("close", function(g) {
+      if (!f)
+        if (g !== 0)
+          u(G("QUERY", g, A), null);
+        else {
+          for (var m = [], L = [], P = p.split(`
+`), D = 0, x = 0, N = P.length; x < N; x++) {
+            var S = P[x].trim();
+            S.length > 0 && (D != 0 && m.push(S), ++D);
           }
-        }
-        for (var i = 0, l = items.length; i < l; i++) {
-          var match = ITEM_PATTERN.exec(items[i]), name, type, value;
-          if (match) {
-            name = match[1].trim();
-            type = match[2].trim();
-            value = match[3];
-            result.push(new RegistryItem(self.host, self.hive, self.key, name, type, value, self.arch));
+          for (var x = 0, N = m.length; x < N; x++) {
+            var H = ue.exec(m[x]), Y, C, I;
+            H && (Y = H[1].trim(), C = H[2].trim(), I = H[3], L.push(new M(h.host, h.hive, h.key, Y, C, I, h.arch)));
           }
+          u(null, L);
         }
-        cb(null, result);
-      }
-    });
-    proc.stdout.on("data", function(data) {
-      buffer += data.toString();
-    });
-    proc.on("error", function(err) {
-      error = err;
-      cb(err);
-    });
-    return this;
-  };
-  Registry.prototype.keys = function keys(cb) {
-    if (typeof cb !== "function")
+    }), c.stdout.on("data", function(g) {
+      p += g.toString();
+    }), c.on("error", function(g) {
+      f = g, u(g);
+    }), this;
+  }, v.prototype.keys = function(u) {
+    if (typeof u != "function")
       throw new TypeError("must specify a callback");
-    var args = ["QUERY", this.path];
-    pushArch(args, this.arch);
-    var proc = spawn(getRegExePath(), args, {
+    var l = ["QUERY", this.path];
+    k(l, this.arch);
+    var c = a(O(), l, {
       cwd: void 0,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"]
-    }), buffer = "", self = this, error = null;
-    var output = captureOutput(proc);
-    proc.on("close", function(code) {
-      if (error) {
-        return;
-      } else if (code !== 0) {
-        cb(mkErrorMsg("QUERY", code, output), null);
+    }), p = "", h = this, f = null, A = T(c);
+    return c.on("close", function(g) {
+      f || g !== 0 && u(G("QUERY", g, A), null);
+    }), c.stdout.on("data", function(g) {
+      p += g.toString();
+    }), c.stdout.on("end", function() {
+      for (var g = [], m = [], L = p.split(`
+`), P = 0, D = L.length; P < D; P++) {
+        var x = L[P].trim();
+        x.length > 0 && g.push(x);
       }
-    });
-    proc.stdout.on("data", function(data) {
-      buffer += data.toString();
-    });
-    proc.stdout.on("end", function() {
-      var items = [], result = [], lines = buffer.split("\n");
-      for (var i = 0, l = lines.length; i < l; i++) {
-        var line = lines[i].trim();
-        if (line.length > 0) {
-          items.push(line);
-        }
+      for (var P = 0, D = g.length; P < D; P++) {
+        var N = Oe.exec(g[P]), S;
+        N && (N[1], S = N[2], S && S !== h.key && m.push(new v({
+          host: h.host,
+          hive: h.hive,
+          key: S,
+          arch: h.arch
+        })));
       }
-      for (var i = 0, l = items.length; i < l; i++) {
-        var match = PATH_PATTERN.exec(items[i]), key;
-        if (match) {
-          match[1];
-          key = match[2];
-          if (key && key !== self.key) {
-            result.push(new Registry({
-              host: self.host,
-              hive: self.hive,
-              key,
-              arch: self.arch
-            }));
-          }
-        }
-      }
-      cb(null, result);
-    });
-    proc.on("error", function(err) {
-      error = err;
-      cb(err);
-    });
-    return this;
-  };
-  Registry.prototype.get = function get(name, cb) {
-    if (typeof cb !== "function")
+      u(null, m);
+    }), c.on("error", function(g) {
+      f = g, u(g);
+    }), this;
+  }, v.prototype.get = function(u, l) {
+    if (typeof l != "function")
       throw new TypeError("must specify a callback");
-    var args = ["QUERY", this.path];
-    if (name == "")
-      args.push("/ve");
-    else
-      args = args.concat(["/v", name]);
-    pushArch(args, this.arch);
-    var proc = spawn(getRegExePath(), args, {
+    var c = ["QUERY", this.path];
+    u == "" ? c.push("/ve") : c = c.concat(["/v", u]), k(c, this.arch);
+    var p = a(O(), c, {
       cwd: void 0,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"]
-    }), buffer = "", self = this, error = null;
-    var output = captureOutput(proc);
-    proc.on("close", function(code) {
-      if (error) {
-        return;
-      } else if (code !== 0) {
-        cb(mkErrorMsg("QUERY", code, output), null);
-      } else {
-        var items = [], result = null, lines = buffer.split("\n"), lineNumber = 0;
-        for (var i = 0, l = lines.length; i < l; i++) {
-          var line = lines[i].trim();
-          if (line.length > 0) {
-            if (lineNumber != 0) {
-              items.push(line);
-            }
-            ++lineNumber;
+    }), h = "", f = this, A = null, g = T(p);
+    return p.on("close", function(m) {
+      if (!A)
+        if (m !== 0)
+          l(G("QUERY", m, g), null);
+        else {
+          for (var L = [], P = null, D = h.split(`
+`), x = 0, N = 0, S = D.length; N < S; N++) {
+            var H = D[N].trim();
+            H.length > 0 && (x != 0 && L.push(H), ++x);
           }
+          var Y = L[L.length - 1] || "", C = ue.exec(Y), I, ce, le;
+          C && (I = C[1].trim(), ce = C[2].trim(), le = C[3], P = new M(f.host, f.hive, f.key, I, ce, le, f.arch)), l(null, P);
         }
-        var item = items[items.length - 1] || "", match = ITEM_PATTERN.exec(item), name2, type, value;
-        if (match) {
-          name2 = match[1].trim();
-          type = match[2].trim();
-          value = match[3];
-          result = new RegistryItem(self.host, self.hive, self.key, name2, type, value, self.arch);
-        }
-        cb(null, result);
-      }
-    });
-    proc.stdout.on("data", function(data) {
-      buffer += data.toString();
-    });
-    proc.on("error", function(err) {
-      error = err;
-      cb(err);
-    });
-    return this;
-  };
-  Registry.prototype.set = function set(name, type, value, cb) {
-    if (typeof cb !== "function")
+    }), p.stdout.on("data", function(m) {
+      h += m.toString();
+    }), p.on("error", function(m) {
+      A = m, l(m);
+    }), this;
+  }, v.prototype.set = function(u, l, c, p) {
+    if (typeof p != "function")
       throw new TypeError("must specify a callback");
-    if (REG_TYPES.indexOf(type) == -1)
+    if (oe.indexOf(l) == -1)
       throw Error("illegal type specified.");
-    var args = ["ADD", this.path];
-    if (name == "")
-      args.push("/ve");
-    else
-      args = args.concat(["/v", name]);
-    args = args.concat(["/t", type, "/d", value, "/f"]);
-    pushArch(args, this.arch);
-    var proc = spawn(getRegExePath(), args, {
+    var h = ["ADD", this.path];
+    u == "" ? h.push("/ve") : h = h.concat(["/v", u]), h = h.concat(["/t", l, "/d", c, "/f"]), k(h, this.arch);
+    var f = a(O(), h, {
       cwd: void 0,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"]
-    }), error = null;
-    var output = captureOutput(proc);
-    proc.on("close", function(code) {
-      if (error) {
-        return;
-      } else if (code !== 0) {
-        cb(mkErrorMsg("ADD", code, output));
-      } else {
-        cb(null);
-      }
-    });
-    proc.stdout.on("data", function(data) {
-    });
-    proc.on("error", function(err) {
-      error = err;
-      cb(err);
-    });
-    return this;
-  };
-  Registry.prototype.remove = function remove(name, cb) {
-    if (typeof cb !== "function")
+    }), A = null, g = T(f);
+    return f.on("close", function(m) {
+      A || p(m !== 0 ? G("ADD", m, g) : null);
+    }), f.stdout.on("data", function(m) {
+    }), f.on("error", function(m) {
+      A = m, p(m);
+    }), this;
+  }, v.prototype.remove = function(u, l) {
+    if (typeof l != "function")
       throw new TypeError("must specify a callback");
-    var args = name ? ["DELETE", this.path, "/f", "/v", name] : ["DELETE", this.path, "/f", "/ve"];
-    pushArch(args, this.arch);
-    var proc = spawn(getRegExePath(), args, {
+    var c = u ? ["DELETE", this.path, "/f", "/v", u] : ["DELETE", this.path, "/f", "/ve"];
+    k(c, this.arch);
+    var p = a(O(), c, {
       cwd: void 0,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"]
-    }), error = null;
-    var output = captureOutput(proc);
-    proc.on("close", function(code) {
-      if (error) {
-        return;
-      } else if (code !== 0) {
-        cb(mkErrorMsg("DELETE", code, output), null);
-      } else {
-        cb(null);
-      }
-    });
-    proc.stdout.on("data", function(data) {
-    });
-    proc.on("error", function(err) {
-      error = err;
-      cb(err);
-    });
-    return this;
-  };
-  Registry.prototype.clear = function clear(cb) {
-    if (typeof cb !== "function")
+    }), h = null, f = T(p);
+    return p.on("close", function(A) {
+      h || (A !== 0 ? l(G("DELETE", A, f), null) : l(null));
+    }), p.stdout.on("data", function(A) {
+    }), p.on("error", function(A) {
+      h = A, l(A);
+    }), this;
+  }, v.prototype.clear = function(u) {
+    if (typeof u != "function")
       throw new TypeError("must specify a callback");
-    var args = ["DELETE", this.path, "/f", "/va"];
-    pushArch(args, this.arch);
-    var proc = spawn(getRegExePath(), args, {
+    var l = ["DELETE", this.path, "/f", "/va"];
+    k(l, this.arch);
+    var c = a(O(), l, {
       cwd: void 0,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"]
-    }), error = null;
-    var output = captureOutput(proc);
-    proc.on("close", function(code) {
-      if (error) {
-        return;
-      } else if (code !== 0) {
-        cb(mkErrorMsg("DELETE", code, output), null);
-      } else {
-        cb(null);
-      }
-    });
-    proc.stdout.on("data", function(data) {
-    });
-    proc.on("error", function(err) {
-      error = err;
-      cb(err);
-    });
-    return this;
-  };
-  Registry.prototype.erase = Registry.prototype.clear;
-  Registry.prototype.destroy = function destroy(cb) {
-    if (typeof cb !== "function")
+    }), p = null, h = T(c);
+    return c.on("close", function(f) {
+      p || (f !== 0 ? u(G("DELETE", f, h), null) : u(null));
+    }), c.stdout.on("data", function(f) {
+    }), c.on("error", function(f) {
+      p = f, u(f);
+    }), this;
+  }, v.prototype.erase = v.prototype.clear, v.prototype.destroy = function(u) {
+    if (typeof u != "function")
       throw new TypeError("must specify a callback");
-    var args = ["DELETE", this.path, "/f"];
-    pushArch(args, this.arch);
-    var proc = spawn(getRegExePath(), args, {
+    var l = ["DELETE", this.path, "/f"];
+    k(l, this.arch);
+    var c = a(O(), l, {
       cwd: void 0,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"]
-    }), error = null;
-    var output = captureOutput(proc);
-    proc.on("close", function(code) {
-      if (error) {
-        return;
-      } else if (code !== 0) {
-        cb(mkErrorMsg("DELETE", code, output), null);
-      } else {
-        cb(null);
-      }
-    });
-    proc.stdout.on("data", function(data) {
-    });
-    proc.on("error", function(err) {
-      error = err;
-      cb(err);
-    });
-    return this;
-  };
-  Registry.prototype.create = function create(cb) {
-    if (typeof cb !== "function")
+    }), p = null, h = T(c);
+    return c.on("close", function(f) {
+      p || (f !== 0 ? u(G("DELETE", f, h), null) : u(null));
+    }), c.stdout.on("data", function(f) {
+    }), c.on("error", function(f) {
+      p = f, u(f);
+    }), this;
+  }, v.prototype.create = function(u) {
+    if (typeof u != "function")
       throw new TypeError("must specify a callback");
-    var args = ["ADD", this.path, "/f"];
-    pushArch(args, this.arch);
-    var proc = spawn(getRegExePath(), args, {
+    var l = ["ADD", this.path, "/f"];
+    k(l, this.arch);
+    var c = a(O(), l, {
       cwd: void 0,
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"]
-    }), error = null;
-    var output = captureOutput(proc);
-    proc.on("close", function(code) {
-      if (error) {
-        return;
-      } else if (code !== 0) {
-        cb(mkErrorMsg("ADD", code, output), null);
-      } else {
-        cb(null);
-      }
-    });
-    proc.stdout.on("data", function(data) {
-    });
-    proc.on("error", function(err) {
-      error = err;
-      cb(err);
-    });
-    return this;
-  };
-  Registry.prototype.keyExists = function keyExists(cb) {
-    this.values(function(err, items) {
-      if (err) {
-        if (err.code == 1) {
-          return cb(null, false);
-        }
-        return cb(err);
-      }
-      cb(null, true);
-    });
-    return this;
-  };
-  Registry.prototype.valueExists = function valueExists(name, cb) {
-    this.get(name, function(err, item) {
-      if (err) {
-        if (err.code == 1) {
-          return cb(null, false);
-        }
-        return cb(err);
-      }
-      cb(null, true);
-    });
-    return this;
-  };
-  registry = Registry;
-  return registry;
+    }), p = null, h = T(c);
+    return c.on("close", function(f) {
+      p || (f !== 0 ? u(G("ADD", f, h), null) : u(null));
+    }), c.stdout.on("data", function(f) {
+    }), c.on("error", function(f) {
+      p = f, u(f);
+    }), this;
+  }, v.prototype.keyExists = function(u) {
+    return this.values(function(l, c) {
+      if (l)
+        return l.code == 1 ? u(null, !1) : u(l);
+      u(null, !0);
+    }), this;
+  }, v.prototype.valueExists = function(u, l) {
+    return this.get(u, function(c, p) {
+      if (c)
+        return c.code == 1 ? l(null, !1) : l(c);
+      l(null, !0);
+    }), this;
+  }, Q = v, Q;
 }
-var AutoLaunchWindows;
-var hasRequiredAutoLaunchWindows;
-function requireAutoLaunchWindows() {
-  if (hasRequiredAutoLaunchWindows) return AutoLaunchWindows;
-  hasRequiredAutoLaunchWindows = 1;
-  var Winreg, fs2, path2, regKey;
-  fs2 = require$$0;
-  path2 = require$$1;
-  Winreg = requireRegistry();
-  regKey = new Winreg({
-    hive: Winreg.HKCU,
+var X, de;
+function We() {
+  if (de) return X;
+  de = 1;
+  var t, r, a, i;
+  return r = j, a = K, t = Ye(), i = new t({
+    hive: t.HKCU,
     key: "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
-  });
-  AutoLaunchWindows = {
+  }), X = {
     /* Public */
-    enable: function(arg) {
-      var appName, appPath, isHiddenOnLaunch;
-      appName = arg.appName, appPath = arg.appPath, isHiddenOnLaunch = arg.isHiddenOnLaunch;
-      return new Promise(function(resolve, reject) {
-        var args, pathToAutoLaunchedApp, ref, updateDotExe;
-        pathToAutoLaunchedApp = appPath;
-        args = "";
-        updateDotExe = path2.join(path2.dirname(process.execPath), "..", "update.exe");
-        if (((ref = process.versions) != null ? ref.electron : void 0) != null && fs2.existsSync(updateDotExe)) {
-          pathToAutoLaunchedApp = updateDotExe;
-          args = ' --processStart "' + path2.basename(process.execPath) + '"';
-          if (isHiddenOnLaunch) {
-            args += ' --process-start-args "--hidden"';
-          }
-        } else {
-          if (isHiddenOnLaunch) {
-            args += " --hidden";
-          }
-        }
-        return regKey.set(appName, Winreg.REG_SZ, '"' + pathToAutoLaunchedApp + '"' + args, function(err) {
-          if (err != null) {
-            return reject(err);
-          }
-          return resolve();
+    enable: function(n) {
+      var e, s, o;
+      return e = n.appName, s = n.appPath, o = n.isHiddenOnLaunch, new Promise(function(d, _) {
+        var y, w, R, b;
+        return w = s, y = "", b = a.join(a.dirname(process.execPath), "..", "update.exe"), ((R = process.versions) != null ? R.electron : void 0) != null && r.existsSync(b) ? (w = b, y = ' --processStart "' + a.basename(process.execPath) + '"', o && (y += ' --process-start-args "--hidden"')) : o && (y += " --hidden"), i.set(e, t.REG_SZ, '"' + w + '"' + y, function(U) {
+          return U != null ? _(U) : d();
         });
       });
     },
-    disable: function(appName) {
-      return new Promise(function(resolve, reject) {
-        return regKey.remove(appName, function(err) {
-          if (err != null) {
-            if (err.message.indexOf("The system was unable to find the specified registry key or value") !== -1) {
-              return resolve(false);
-            }
-            return reject(err);
-          }
-          return resolve();
+    disable: function(n) {
+      return new Promise(function(e, s) {
+        return i.remove(n, function(o) {
+          return o != null ? o.message.indexOf("The system was unable to find the specified registry key or value") !== -1 ? e(!1) : s(o) : e();
         });
       });
     },
-    isEnabled: function(appName) {
-      return new Promise(function(resolve, reject) {
-        return regKey.get(appName, function(err, item) {
-          if (err != null) {
-            return resolve(false);
-          }
-          return resolve(item != null);
+    isEnabled: function(n) {
+      return new Promise(function(e, s) {
+        return i.get(n, function(o, d) {
+          return o != null ? e(!1) : e(d != null);
         });
       });
     }
-  };
-  return AutoLaunchWindows;
+  }, X;
 }
-var applescript = {};
-var applescriptParser = {};
-var hasRequiredApplescriptParser;
-function requireApplescriptParser() {
-  if (hasRequiredApplescriptParser) return applescriptParser;
-  hasRequiredApplescriptParser = 1;
-  (function(exports) {
-    exports.parse = function(str) {
-      if (str.length == 0) {
-        return;
+var z = {}, J = {}, ve;
+function Be() {
+  return ve || (ve = 1, function(t) {
+    t.parse = function(i) {
+      if (i.length != 0) {
+        var n = r.call({
+          value: i,
+          index: 0
+        });
+        return n;
       }
-      var rtn = parseFromFirstRemaining.call({
-        value: str,
-        index: 0
-      });
-      return rtn;
     };
-    function parseFromFirstRemaining() {
-      var cur = this.value[this.index];
-      switch (cur) {
+    function r() {
+      var i = this.value[this.index];
+      switch (i) {
         case "{":
-          return exports.ArrayParser.call(this);
+          return t.ArrayParser.call(this);
         case '"':
-          return exports.StringParser.call(this);
+          return t.StringParser.call(this);
         case "a":
-          if (this.value.substring(this.index, this.index + 5) == "alias") {
-            return exports.AliasParser.call(this);
-          }
+          if (this.value.substring(this.index, this.index + 5) == "alias")
+            return t.AliasParser.call(this);
           break;
         case "«":
-          if (this.value.substring(this.index, this.index + 5) == "«data") {
-            return exports.DataParser.call(this);
-          }
+          if (this.value.substring(this.index, this.index + 5) == "«data")
+            return t.DataParser.call(this);
           break;
       }
-      if (!isNaN(cur)) {
-        return exports.NumberParser.call(this);
-      }
-      return exports.UndefinedParser.call(this);
+      return isNaN(i) ? t.UndefinedParser.call(this) : t.NumberParser.call(this);
     }
-    exports.AliasParser = function() {
-      this.index += 6;
-      return "/Volumes/" + exports.StringParser.call(this).replace(/:/g, "/");
+    t.AliasParser = function() {
+      return this.index += 6, "/Volumes/" + t.StringParser.call(this).replace(/:/g, "/");
+    }, t.ArrayParser = function() {
+      for (var i = [], n = this.value[++this.index]; n != "}"; )
+        i.push(r.call(this)), this.value[this.index] == "," && (this.index += 2), n = this.value[this.index];
+      return this.index++, i;
+    }, t.DataParser = function() {
+      var i = t.UndefinedParser.call(this);
+      i = i.substring(6, i.length - 1);
+      var n = i.substring(0, 4);
+      i = i.substring(4, i.length);
+      for (var e = new Buffer(i.length / 2), s = 0, o = 0, d = i.length; o < d; o += 2)
+        e[s++] = parseInt(i[o] + i[o + 1], 16);
+      return e.type = n, e;
+    }, t.NumberParser = function() {
+      return Number(t.UndefinedParser.call(this));
+    }, t.StringParser = function(i) {
+      for (var n = "", e = ++this.index, s = this.value[e++]; s != '"'; )
+        s == "\\" && (n += this.value.substring(this.index, e - 1), this.index = e++), s = this.value[e++];
+      return n += this.value.substring(this.index, e - 1), this.index = e, n;
     };
-    exports.ArrayParser = function() {
-      var rtn = [], cur = this.value[++this.index];
-      while (cur != "}") {
-        rtn.push(parseFromFirstRemaining.call(this));
-        if (this.value[this.index] == ",") this.index += 2;
-        cur = this.value[this.index];
-      }
-      this.index++;
-      return rtn;
+    var a = /}|,|\n/;
+    t.UndefinedParser = function() {
+      for (var i = this.index, n = this.value[i++]; !a.test(n); )
+        n = this.value[i++];
+      var e = this.value.substring(this.index, i - 1);
+      return this.index = i - 1, e;
     };
-    exports.DataParser = function() {
-      var body = exports.UndefinedParser.call(this);
-      body = body.substring(6, body.length - 1);
-      var type = body.substring(0, 4);
-      body = body.substring(4, body.length);
-      var buf = new Buffer(body.length / 2);
-      var count = 0;
-      for (var i = 0, l = body.length; i < l; i += 2) {
-        buf[count++] = parseInt(body[i] + body[i + 1], 16);
-      }
-      buf.type = type;
-      return buf;
-    };
-    exports.NumberParser = function() {
-      return Number(exports.UndefinedParser.call(this));
-    };
-    exports.StringParser = function(str) {
-      var rtn = "", end = ++this.index, cur = this.value[end++];
-      while (cur != '"') {
-        if (cur == "\\") {
-          rtn += this.value.substring(this.index, end - 1);
-          this.index = end++;
-        }
-        cur = this.value[end++];
-      }
-      rtn += this.value.substring(this.index, end - 1);
-      this.index = end;
-      return rtn;
-    };
-    var END_OF_TOKEN = /}|,|\n/;
-    exports.UndefinedParser = function() {
-      var end = this.index, cur = this.value[end++];
-      while (!END_OF_TOKEN.test(cur)) {
-        cur = this.value[end++];
-      }
-      var rtn = this.value.substring(this.index, end - 1);
-      this.index = end - 1;
-      return rtn;
-    };
-  })(applescriptParser);
-  return applescriptParser;
+  }(J)), J;
 }
-var hasRequiredApplescript;
-function requireApplescript() {
-  if (hasRequiredApplescript) return applescript;
-  hasRequiredApplescript = 1;
-  (function(exports) {
-    var spawn = require$$2.spawn;
-    exports.Parsers = requireApplescriptParser();
-    var parse = exports.Parsers.parse;
-    exports.osascript = "osascript";
-    exports.execFile = function execFile(file, args, callback) {
-      if (!Array.isArray(args)) {
-        callback = args;
-        args = [];
-      }
-      return runApplescript(file, args, callback);
+var Ee;
+function je() {
+  return Ee || (Ee = 1, function(t) {
+    var r = be.spawn;
+    t.Parsers = Be();
+    var a = t.Parsers.parse;
+    t.osascript = "osascript", t.execFile = function(s, o, d) {
+      return Array.isArray(o) || (d = o, o = []), i(s, o, d);
+    }, t.execString = function(s, o) {
+      return i(s, o);
     };
-    exports.execString = function execString(str, callback) {
-      return runApplescript(str, callback);
-    };
-    function runApplescript(strOrPath, args, callback) {
-      var isString = false;
-      if (!Array.isArray(args)) {
-        callback = args;
-        args = [];
-        isString = true;
-      }
-      args.push("-ss");
-      if (!isString) {
-        args.push(strOrPath);
-      }
-      var interpreter = spawn(exports.osascript, args);
-      bufferBody(interpreter.stdout);
-      bufferBody(interpreter.stderr);
-      interpreter.on("exit", function(code) {
-        var result = parse(interpreter.stdout.body);
-        var err;
-        if (code) {
-          err = new Error(interpreter.stderr.body);
-          err.appleScript = strOrPath;
-          err.exitCode = code;
-        }
-        if (callback) {
-          callback(err, result, interpreter.stderr.body);
-        }
-      });
-      if (isString) {
-        interpreter.stdin.write(strOrPath);
-        interpreter.stdin.end();
-      }
+    function i(e, s, o) {
+      var d = !1;
+      Array.isArray(s) || (o = s, s = [], d = !0), s.push("-ss"), d || s.push(e);
+      var _ = r(t.osascript, s);
+      n(_.stdout), n(_.stderr), _.on("exit", function(y) {
+        var w = a(_.stdout.body), R;
+        y && (R = new Error(_.stderr.body), R.appleScript = e, R.exitCode = y), o && o(R, w, _.stderr.body);
+      }), d && (_.stdin.write(e), _.stdin.end());
     }
-    function bufferBody(stream) {
-      stream.body = "";
-      stream.setEncoding("utf8");
-      stream.on("data", function(chunk) {
-        stream.body += chunk;
+    function n(e) {
+      e.body = "", e.setEncoding("utf8"), e.on("data", function(s) {
+        e.body += s;
       });
     }
-  })(applescript);
-  return applescript;
+  }(z)), z;
 }
-var untildify;
-var hasRequiredUntildify;
-function requireUntildify() {
-  if (hasRequiredUntildify) return untildify;
-  hasRequiredUntildify = 1;
-  const home = require$$0$3.homedir();
-  untildify = (str) => {
-    if (typeof str !== "string") {
-      throw new TypeError(`Expected a string, got ${typeof str}`);
-    }
-    return home ? str.replace(/^~(?=$|\/|\\)/, home) : str;
-  };
-  return untildify;
+var ee, _e;
+function Ne() {
+  if (_e) return ee;
+  _e = 1;
+  const t = Ce.homedir();
+  return ee = (r) => {
+    if (typeof r != "string")
+      throw new TypeError(`Expected a string, got ${typeof r}`);
+    return t ? r.replace(/^~(?=$|\/|\\)/, t) : r;
+  }, ee;
 }
-var mkdirp;
-var hasRequiredMkdirp;
-function requireMkdirp() {
-  if (hasRequiredMkdirp) return mkdirp;
-  hasRequiredMkdirp = 1;
-  var path2 = require$$1;
-  var fs2 = require$$0;
-  var _0777 = parseInt("0777", 8);
-  mkdirp = mkdirP.mkdirp = mkdirP.mkdirP = mkdirP;
-  function mkdirP(p, opts, f, made) {
-    if (typeof opts === "function") {
-      f = opts;
-      opts = {};
-    } else if (!opts || typeof opts !== "object") {
-      opts = { mode: opts };
-    }
-    var mode = opts.mode;
-    var xfs = opts.fs || fs2;
-    if (mode === void 0) {
-      mode = _0777;
-    }
-    if (!made) made = null;
-    var cb = f || /* istanbul ignore next */
+var te, ge;
+function Ze() {
+  if (ge) return te;
+  ge = 1;
+  var t = K, r = j, a = parseInt("0777", 8);
+  te = i.mkdirp = i.mkdirP = i;
+  function i(n, e, s, o) {
+    typeof e == "function" ? (s = e, e = {}) : (!e || typeof e != "object") && (e = { mode: e });
+    var d = e.mode, _ = e.fs || r;
+    d === void 0 && (d = a), o || (o = null);
+    var y = s || /* istanbul ignore next */
     function() {
     };
-    p = path2.resolve(p);
-    xfs.mkdir(p, mode, function(er) {
-      if (!er) {
-        made = made || p;
-        return cb(null, made);
-      }
-      switch (er.code) {
+    n = t.resolve(n), _.mkdir(n, d, function(w) {
+      if (!w)
+        return o = o || n, y(null, o);
+      switch (w.code) {
         case "ENOENT":
-          if (path2.dirname(p) === p) return cb(er);
-          mkdirP(path2.dirname(p), opts, function(er2, made2) {
-            if (er2) cb(er2, made2);
-            else mkdirP(p, opts, cb, made2);
+          if (t.dirname(n) === n) return y(w);
+          i(t.dirname(n), e, function(R, b) {
+            R ? y(R, b) : i(n, e, y, b);
           });
           break;
         default:
-          xfs.stat(p, function(er2, stat) {
-            if (er2 || !stat.isDirectory()) cb(er, made);
-            else cb(null, made);
+          _.stat(n, function(R, b) {
+            R || !b.isDirectory() ? y(w, o) : y(null, o);
           });
           break;
       }
     });
   }
-  mkdirP.sync = function sync(p, opts, made) {
-    if (!opts || typeof opts !== "object") {
-      opts = { mode: opts };
-    }
-    var mode = opts.mode;
-    var xfs = opts.fs || fs2;
-    if (mode === void 0) {
-      mode = _0777;
-    }
-    if (!made) made = null;
-    p = path2.resolve(p);
+  return i.sync = function n(e, s, o) {
+    (!s || typeof s != "object") && (s = { mode: s });
+    var d = s.mode, _ = s.fs || r;
+    d === void 0 && (d = a), o || (o = null), e = t.resolve(e);
     try {
-      xfs.mkdirSync(p, mode);
-      made = made || p;
-    } catch (err0) {
-      switch (err0.code) {
+      _.mkdirSync(e, d), o = o || e;
+    } catch (w) {
+      switch (w.code) {
         case "ENOENT":
-          made = sync(path2.dirname(p), opts, made);
-          sync(p, opts, made);
+          o = n(t.dirname(e), s, o), n(e, s, o);
           break;
         default:
-          var stat;
+          var y;
           try {
-            stat = xfs.statSync(p);
-          } catch (err1) {
-            throw err0;
+            y = _.statSync(e);
+          } catch {
+            throw w;
           }
-          if (!stat.isDirectory()) throw err0;
+          if (!y.isDirectory()) throw w;
           break;
       }
     }
-    return made;
-  };
-  return mkdirp;
+    return o;
+  }, te;
 }
-var fileBasedUtilities;
-var hasRequiredFileBasedUtilities;
-function requireFileBasedUtilities() {
-  if (hasRequiredFileBasedUtilities) return fileBasedUtilities;
-  hasRequiredFileBasedUtilities = 1;
-  var fs2, mkdirp2;
-  fs2 = require$$0;
-  mkdirp2 = requireMkdirp();
-  fileBasedUtilities = {
+var ne, ye;
+function Se() {
+  if (ye) return ne;
+  ye = 1;
+  var t, r;
+  return t = j, r = Ze(), ne = {
     /* Public */
-    createFile: function(arg) {
-      var data, directory, filePath;
-      directory = arg.directory, filePath = arg.filePath, data = arg.data;
-      return new Promise(function(resolve, reject) {
-        return mkdirp2(directory, function(mkdirErr) {
-          if (mkdirErr != null) {
-            return reject(mkdirErr);
-          }
-          return fs2.writeFile(filePath, data, function(writeErr) {
-            if (writeErr != null) {
-              return reject(writeErr);
-            }
-            return resolve();
+    createFile: function(a) {
+      var i, n, e;
+      return n = a.directory, e = a.filePath, i = a.data, new Promise(function(s, o) {
+        return r(n, function(d) {
+          return d != null ? o(d) : t.writeFile(e, i, function(_) {
+            return _ != null ? o(_) : s();
           });
         });
       });
     },
-    isEnabled: function(filePath) {
-      return new Promise(/* @__PURE__ */ function(_this) {
-        return function(resolve, reject) {
-          return fs2.stat(filePath, function(err, stat) {
-            if (err != null) {
-              return resolve(false);
-            }
-            return resolve(stat != null);
+    isEnabled: function(a) {
+      return new Promise(/* @__PURE__ */ function(i) {
+        return function(n, e) {
+          return t.stat(a, function(s, o) {
+            return s != null ? n(!1) : n(o != null);
           });
         };
       }());
     },
-    removeFile: function(filePath) {
-      return new Promise(/* @__PURE__ */ function(_this) {
-        return function(resolve, reject) {
-          return fs2.stat(filePath, function(statErr) {
-            if (statErr != null) {
-              return resolve();
-            }
-            return fs2.unlink(filePath, function(unlinkErr) {
-              if (unlinkErr != null) {
-                return reject(unlinkErr);
-              }
-              return resolve();
+    removeFile: function(a) {
+      return new Promise(/* @__PURE__ */ function(i) {
+        return function(n, e) {
+          return t.stat(a, function(s) {
+            return s != null ? n() : t.unlink(a, function(o) {
+              return o != null ? e(o) : n();
             });
           });
         };
       }());
     }
-  };
-  return fileBasedUtilities;
+  }, ne;
 }
-var AutoLaunchMac;
-var hasRequiredAutoLaunchMac;
-function requireAutoLaunchMac() {
-  if (hasRequiredAutoLaunchMac) return AutoLaunchMac;
-  hasRequiredAutoLaunchMac = 1;
-  var applescript2, fileBasedUtilities2, untildify2, indexOf = [].indexOf || function(item) {
-    for (var i = 0, l = this.length; i < l; i++) {
-      if (i in this && this[i] === item) return i;
-    }
+var re, me;
+function Ve() {
+  if (me) return re;
+  me = 1;
+  var t, r, a, i = [].indexOf || function(n) {
+    for (var e = 0, s = this.length; e < s; e++)
+      if (e in this && this[e] === n) return e;
     return -1;
   };
-  applescript2 = requireApplescript();
-  untildify2 = requireUntildify();
-  fileBasedUtilities2 = requireFileBasedUtilities();
-  AutoLaunchMac = {
+  return t = je(), a = Ne(), r = Se(), re = {
     /* Public */
-    enable: function(arg) {
-      var appName, appPath, data, isHiddenOnLaunch, isHiddenValue, mac, programArguments, programArgumentsSection, properties;
-      appName = arg.appName, appPath = arg.appPath, isHiddenOnLaunch = arg.isHiddenOnLaunch, mac = arg.mac;
-      if (mac.useLaunchAgent) {
-        programArguments = [appPath];
-        if (isHiddenOnLaunch) {
-          programArguments.push("--hidden");
-        }
-        programArgumentsSection = programArguments.map(function(argument) {
-          return "    <string>" + argument + "</string>";
-        }).join("\n");
-        data = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n  <key>Label</key>\n  <string>' + appName + "</string>\n  <key>ProgramArguments</key>\n  <array>\n  " + programArgumentsSection + "\n  </array>\n  <key>RunAtLoad</key>\n  <true/>\n</dict>\n</plist>";
-        return fileBasedUtilities2.createFile({
-          data,
-          directory: this.getDirectory(),
-          filePath: this.getFilePath(appName)
-        });
-      }
-      isHiddenValue = isHiddenOnLaunch ? "true" : "false";
-      properties = '{path:"' + appPath + '", hidden:' + isHiddenValue + ', name:"' + appName + '"}';
-      return this.execApplescriptCommand("make login item at end with properties " + properties);
-    },
-    disable: function(appName, mac) {
-      if (mac.useLaunchAgent) {
-        return fileBasedUtilities2.removeFile(this.getFilePath(appName));
-      }
-      return this.execApplescriptCommand('delete login item "' + appName + '"');
-    },
-    isEnabled: function(appName, mac) {
-      if (mac.useLaunchAgent) {
-        return fileBasedUtilities2.isEnabled(this.getFilePath(appName));
-      }
-      return this.execApplescriptCommand("get the name of every login item").then(function(loginItems) {
-        return loginItems != null && indexOf.call(loginItems, appName) >= 0;
-      });
-    },
-    /* Private */
-    execApplescriptCommand: function(commandSuffix) {
-      return new Promise(function(resolve, reject) {
-        return applescript2.execString('tell application "System Events" to ' + commandSuffix, function(err, result) {
-          if (err != null) {
-            return reject(err);
-          }
-          return resolve(result);
-        });
-      });
-    },
-    getDirectory: function() {
-      return untildify2("~/Library/LaunchAgents/");
-    },
-    getFilePath: function(appName) {
-      return "" + this.getDirectory() + appName + ".plist";
-    }
-  };
-  return AutoLaunchMac;
-}
-var AutoLaunchLinux;
-var hasRequiredAutoLaunchLinux;
-function requireAutoLaunchLinux() {
-  if (hasRequiredAutoLaunchLinux) return AutoLaunchLinux;
-  hasRequiredAutoLaunchLinux = 1;
-  var fileBasedUtilities2, untildify2;
-  untildify2 = requireUntildify();
-  fileBasedUtilities2 = requireFileBasedUtilities();
-  AutoLaunchLinux = {
-    /* Public */
-    enable: function(arg) {
-      var appName, appPath, data, hiddenArg, isHiddenOnLaunch;
-      appName = arg.appName, appPath = arg.appPath, isHiddenOnLaunch = arg.isHiddenOnLaunch;
-      hiddenArg = isHiddenOnLaunch ? " --hidden" : "";
-      data = "[Desktop Entry]\nType=Application\nVersion=1.0\nName=" + appName + "\nComment=" + appName + "startup script\nExec=" + appPath + hiddenArg + "\nStartupNotify=false\nTerminal=false";
-      return fileBasedUtilities2.createFile({
-        data,
+    enable: function(n) {
+      var e, s, o, d, _, y, w, R, b;
+      return e = n.appName, s = n.appPath, d = n.isHiddenOnLaunch, y = n.mac, y.useLaunchAgent ? (w = [s], d && w.push("--hidden"), R = w.map(function(U) {
+        return "    <string>" + U + "</string>";
+      }).join(`
+`), o = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>` + e + `</string>
+  <key>ProgramArguments</key>
+  <array>
+  ` + R + `
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>`, r.createFile({
+        data: o,
         directory: this.getDirectory(),
-        filePath: this.getFilePath(appName)
+        filePath: this.getFilePath(e)
+      })) : (_ = d ? "true" : "false", b = '{path:"' + s + '", hidden:' + _ + ', name:"' + e + '"}', this.execApplescriptCommand("make login item at end with properties " + b));
+    },
+    disable: function(n, e) {
+      return e.useLaunchAgent ? r.removeFile(this.getFilePath(n)) : this.execApplescriptCommand('delete login item "' + n + '"');
+    },
+    isEnabled: function(n, e) {
+      return e.useLaunchAgent ? r.isEnabled(this.getFilePath(n)) : this.execApplescriptCommand("get the name of every login item").then(function(s) {
+        return s != null && i.call(s, n) >= 0;
       });
     },
-    disable: function(appName) {
-      return fileBasedUtilities2.removeFile(this.getFilePath(appName));
+    /* Private */
+    execApplescriptCommand: function(n) {
+      return new Promise(function(e, s) {
+        return t.execString('tell application "System Events" to ' + n, function(o, d) {
+          return o != null ? s(o) : e(d);
+        });
+      });
     },
-    isEnabled: function(appName) {
-      return fileBasedUtilities2.isEnabled(this.getFilePath(appName));
+    getDirectory: function() {
+      return a("~/Library/LaunchAgents/");
+    },
+    getFilePath: function(n) {
+      return "" + this.getDirectory() + n + ".plist";
+    }
+  }, re;
+}
+var ie, we;
+function Qe() {
+  if (we) return ie;
+  we = 1;
+  var t, r;
+  return r = Ne(), t = Se(), ie = {
+    /* Public */
+    enable: function(a) {
+      var i, n, e, s, o;
+      return i = a.appName, n = a.appPath, o = a.isHiddenOnLaunch, s = o ? " --hidden" : "", e = `[Desktop Entry]
+Type=Application
+Version=1.0
+Name=` + i + `
+Comment=` + i + `startup script
+Exec=` + n + s + `
+StartupNotify=false
+Terminal=false`, t.createFile({
+        data: e,
+        directory: this.getDirectory(),
+        filePath: this.getFilePath(i)
+      });
+    },
+    disable: function(a) {
+      return t.removeFile(this.getFilePath(a));
+    },
+    isEnabled: function(a) {
+      return t.isEnabled(this.getFilePath(a));
     },
     /* Private */
     getDirectory: function() {
-      return untildify2("~/.config/autostart/");
+      return r("~/.config/autostart/");
     },
-    getFilePath: function(appName) {
-      return "" + this.getDirectory() + appName + ".desktop";
+    getFilePath: function(a) {
+      return "" + this.getDirectory() + a + ".desktop";
     }
-  };
-  return AutoLaunchLinux;
+  }, ie;
 }
-var isPathAbsolute, bind = function(fn, me) {
+var Te, W = function(t, r) {
   return function() {
-    return fn.apply(me, arguments);
+    return t.apply(r, arguments);
   };
 };
-isPathAbsolute = pathIsAbsoluteExports;
-var dist = function() {
-  function AutoLaunch2(arg) {
-    var isHidden, mac, name, path2, versions;
-    name = arg.name, isHidden = arg.isHidden, mac = arg.mac, path2 = arg.path;
-    this.fixOpts = bind(this.fixOpts, this);
-    this.isEnabled = bind(this.isEnabled, this);
-    this.disable = bind(this.disable, this);
-    this.enable = bind(this.enable, this);
-    if (name == null) {
+Te = Ke;
+var Xe = function() {
+  function t(r) {
+    var a, i, n, e, s;
+    if (n = r.name, a = r.isHidden, i = r.mac, e = r.path, this.fixOpts = W(this.fixOpts, this), this.isEnabled = W(this.isEnabled, this), this.disable = W(this.disable, this), this.enable = W(this.enable, this), n == null)
       throw new Error("You must specify a name");
-    }
-    this.opts = {
-      appName: name,
-      isHiddenOnLaunch: isHidden != null ? isHidden : false,
-      mac: mac != null ? mac : {}
-    };
-    versions = typeof process !== "undefined" && process !== null ? process.versions : void 0;
-    if (path2 != null) {
-      if (!isPathAbsolute(path2)) {
+    if (this.opts = {
+      appName: n,
+      isHiddenOnLaunch: a ?? !1,
+      mac: i ?? {}
+    }, s = typeof process < "u" && process !== null ? process.versions : void 0, e != null) {
+      if (!Te(e))
         throw new Error("path must be absolute");
-      }
-      this.opts.appPath = path2;
-    } else if (versions != null && (versions.nw != null || versions["node-webkit"] != null || versions.electron != null)) {
+      this.opts.appPath = e;
+    } else if (s != null && (s.nw != null || s["node-webkit"] != null || s.electron != null))
       this.opts.appPath = process.execPath;
-    } else {
+    else
       throw new Error("You must give a path (this is only auto-detected for NW.js and Electron apps)");
-    }
-    this.fixOpts();
-    this.api = null;
-    if (/^win/.test(process.platform)) {
-      this.api = requireAutoLaunchWindows();
-    } else if (/darwin/.test(process.platform)) {
-      this.api = requireAutoLaunchMac();
-    } else if (/linux/.test(process.platform) || /freebsd/.test(process.platform)) {
-      this.api = requireAutoLaunchLinux();
-    } else {
+    if (this.fixOpts(), this.api = null, /^win/.test(process.platform))
+      this.api = We();
+    else if (/darwin/.test(process.platform))
+      this.api = Ve();
+    else if (/linux/.test(process.platform) || /freebsd/.test(process.platform))
+      this.api = Qe();
+    else
       throw new Error("Unsupported platform");
-    }
   }
-  AutoLaunch2.prototype.enable = function() {
+  return t.prototype.enable = function() {
     return this.api.enable(this.opts);
-  };
-  AutoLaunch2.prototype.disable = function() {
+  }, t.prototype.disable = function() {
     return this.api.disable(this.opts.appName, this.opts.mac);
-  };
-  AutoLaunch2.prototype.isEnabled = function() {
+  }, t.prototype.isEnabled = function() {
     return this.api.isEnabled(this.opts.appName, this.opts.mac);
-  };
-  AutoLaunch2.prototype.fixMacExecPath = function(path2, macOptions) {
-    path2 = path2.replace(/(^.+?[^\/]+?\.app)\/Contents\/(Frameworks\/((\1|[^\/]+?) Helper)\.app\/Contents\/MacOS\/\3|MacOS\/Electron)/, "$1");
-    if (!macOptions.useLaunchAgent) {
-      path2 = path2.replace(/\.app\/Contents\/MacOS\/[^\/]*$/, ".app");
-    }
-    return path2;
-  };
-  AutoLaunch2.prototype.fixOpts = function() {
-    var tempPath;
-    this.opts.appPath = this.opts.appPath.replace(/\/$/, "");
-    if (/darwin/.test(process.platform)) {
-      this.opts.appPath = this.fixMacExecPath(this.opts.appPath, this.opts.mac);
-    }
-    if (this.opts.appPath.indexOf("/") !== -1) {
-      tempPath = this.opts.appPath.split("/");
-      this.opts.appName = tempPath[tempPath.length - 1];
-    } else if (this.opts.appPath.indexOf("\\") !== -1) {
-      tempPath = this.opts.appPath.split("\\");
-      this.opts.appName = tempPath[tempPath.length - 1];
-      this.opts.appName = this.opts.appName.substr(0, this.opts.appName.length - ".exe".length);
-    }
-    if (/darwin/.test(process.platform)) {
-      if (this.opts.appName.indexOf(".app", this.opts.appName.length - ".app".length) !== -1) {
-        return this.opts.appName = this.opts.appName.substr(0, this.opts.appName.length - ".app".length);
-      }
-    }
-  };
-  return AutoLaunch2;
+  }, t.prototype.fixMacExecPath = function(r, a) {
+    return r = r.replace(/(^.+?[^\/]+?\.app)\/Contents\/(Frameworks\/((\1|[^\/]+?) Helper)\.app\/Contents\/MacOS\/\3|MacOS\/Electron)/, "$1"), a.useLaunchAgent || (r = r.replace(/\.app\/Contents\/MacOS\/[^\/]*$/, ".app")), r;
+  }, t.prototype.fixOpts = function() {
+    var r;
+    if (this.opts.appPath = this.opts.appPath.replace(/\/$/, ""), /darwin/.test(process.platform) && (this.opts.appPath = this.fixMacExecPath(this.opts.appPath, this.opts.mac)), this.opts.appPath.indexOf("/") !== -1 ? (r = this.opts.appPath.split("/"), this.opts.appName = r[r.length - 1]) : this.opts.appPath.indexOf("\\") !== -1 && (r = this.opts.appPath.split("\\"), this.opts.appName = r[r.length - 1], this.opts.appName = this.opts.appName.substr(0, this.opts.appName.length - 4)), /darwin/.test(process.platform) && this.opts.appName.indexOf(".app", this.opts.appName.length - 4) !== -1)
+      return this.opts.appName = this.opts.appName.substr(0, this.opts.appName.length - 4);
+  }, t;
 }();
-const { app: app$1, ipcMain } = require$$0$1;
-const AutoLaunch = dist;
-class AutoLaunchManager {
-  constructor(options = {}) {
-    this.appName = options.appName || app$1.getName();
-    this.isHidden = options.isHidden || false;
-    this.autoLauncher = new AutoLaunch({
+const { app: Re, ipcMain: Ae } = B, ze = Xe;
+class Je {
+  constructor(r = {}) {
+    this.appName = r.appName || Re.getName(), this.isHidden = r.isHidden || !1, this.autoLauncher = new ze({
       name: this.appName,
-      path: app$1.getPath("exe"),
+      path: Re.getPath("exe"),
       isHidden: this.isHidden
-    });
-    this.isEnabled = false;
+    }), this.isEnabled = !1;
   }
   // 初始化并检查当前状态
   async init() {
     try {
-      this.isEnabled = await this.autoLauncher.isEnabled();
-      return this.isEnabled;
-    } catch (error) {
-      console.error("检查自启动状态失败:", error);
-      return false;
+      return this.isEnabled = await this.autoLauncher.isEnabled(), this.isEnabled;
+    } catch (r) {
+      return console.error("检查自启动状态失败:", r), !1;
     }
   }
   // 启用自启动
   async enable() {
     try {
-      if (!this.isEnabled) {
-        await this.autoLauncher.enable();
-        this.isEnabled = true;
+      return this.isEnabled || (await this.autoLauncher.enable(), this.isEnabled = !0), !0;
+    } catch (r) {
+      if (console.error("启用自启动失败:", r), r.message.includes("Access denied") || r.code === "ACCESS_DENIED") {
+        const { dialog: a } = B;
+        await a.showMessageBox({
+          type: "info",
+          title: "开机自启动设置",
+          message: "无法设置开机自启动",
+          detail: `您可以通过以下步骤手动设置：
+1. 打开任务管理器
+2. 切换到"启动"选项卡
+3. 找到应用并启用`,
+          buttons: ["我知道了"]
+        });
       }
-      return true;
-    } catch (error) {
-      console.error("启用自启动失败:", error);
-      return false;
+      return console.error("Failed to enable auto-launch:", r), !1;
     }
   }
   // 禁用自启动
   async disable() {
     try {
-      if (this.isEnabled) {
-        await this.autoLauncher.disable();
-        this.isEnabled = false;
-      }
-      return true;
-    } catch (error) {
-      console.error("禁用自启动失败:", error);
-      return false;
+      return this.isEnabled && (await this.autoLauncher.disable(), this.isEnabled = !1), !0;
+    } catch (r) {
+      return console.error("禁用自启动失败:", r), !1;
     }
   }
   // 切换自启动状态
-  async toggle(state) {
+  async toggle(r) {
     try {
-      console.log("state :>> ", state);
-      if (state) {
-        await this.enable();
-      } else {
-        await this.disable();
-      }
-      return { success: true, message: "切换自启动状态成功" };
-    } catch (e) {
-      return { success: false, message: e };
+      return r ? await this.enable() : await this.disable(), { success: !0, message: "切换自启动状态成功" };
+    } catch (a) {
+      return { success: !1, message: a };
     }
   }
   // 获取当前状态
@@ -1157,70 +751,48 @@ class AutoLaunchManager {
     return this.isEnabled;
   }
 }
-async function AutoLaunchManagerApi$1() {
-  const autoLaunch = new AutoLaunchManager({
+async function et() {
+  const t = new Je({
     appName: "todoList",
     // 可选，默认使用 app.getName()
-    isHidden: false
+    isHidden: !1
     // 可选，是否隐藏窗口启动
   });
-  await autoLaunch.init();
-  ipcMain.handle("toggle-auto-launch", async (_event, state) => {
-    console.log("autoLaunch.getState() :>> ", autoLaunch.getState());
-    return await autoLaunch.toggle(state);
-  });
-  ipcMain.handle("get-auto-launch-state", () => {
-    return autoLaunch.getState();
-  });
+  await t.init(), Ae.handle("toggle-auto-launch", async (r, a) => await t.toggle(a)), Ae.handle("get-auto-launch-state", () => t.getState());
 }
-var autoLaunchManager = AutoLaunchManagerApi$1;
-const { app, BrowserWindow, globalShortcut } = require$$0$1;
-const setupDataPersistenceApi = backup;
-const AutoLaunchManagerApi = autoLaunchManager;
-const path = require$$1;
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+var tt = et;
+const { app: $, BrowserWindow: se, globalShortcut: nt } = B, rt = qe, it = tt, Pe = K;
+$.on("window-all-closed", () => {
+  process.platform !== "darwin" && $.quit();
 });
-let mainWindow;
-function createWindow() {
-  mainWindow = new BrowserWindow({
+let q;
+function xe() {
+  q = new se({
     width: 1e3,
     height: 800,
-    show: false,
+    show: !1,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: true,
-      preload: path.join(__dirname, "api/preload.cjs")
+      nodeIntegration: !0,
+      contextIsolation: !0,
+      preload: Pe.join(__dirname, "api/preload.cjs")
     },
     webContents: {
-      openDevTools: true
+      openDevTools: !0
     }
-  });
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
-  }
-  mainWindow.once("ready-to-show", () => {
-    mainWindow.show();
+  }), process.env.VITE_DEV_SERVER_URL ? q.loadURL(process.env.VITE_DEV_SERVER_URL) : q.loadFile(Pe.join(__dirname, "../dist/index.html")), q.once("ready-to-show", () => {
+    q.show();
   });
 }
-app.whenReady().then(async () => {
-  createWindow();
-  setupDataPersistenceApi();
-  AutoLaunchManagerApi();
-  app.on("activate", function() {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-  globalShortcut.register("CommandOrControl+Shift+I", () => {
-    BrowserWindow.getFocusedWindow().webContents.toggleDevTools();
+$.whenReady().then(async () => {
+  xe(), rt(), it(), $.on("activate", function() {
+    se.getAllWindows().length === 0 && xe();
+  }), nt.register("CommandOrControl+Shift+I", () => {
+    se.getFocusedWindow().webContents.toggleDevTools();
   });
 });
-app.on("window-all-closed", function() {
-  if (process.platform !== "darwin") app.quit();
+$.on("window-all-closed", function() {
+  process.platform !== "darwin" && $.quit();
 });
 export {
-  main as default
+  ft as default
 };

@@ -38,6 +38,20 @@ class AutoLaunchManager {
       return true
     } catch (error) {
       console.error('启用自启动失败:', error)
+      // 处理权限被拒绝的情况
+      if (error.message.includes('Access denied') || error.code === 'ACCESS_DENIED') {
+        // 可以在这里显示自定义对话框，告知用户如何手动启用
+        const { dialog } = require('electron')
+        await dialog.showMessageBox({
+          type: 'info',
+          title: '开机自启动设置',
+          message: '无法设置开机自启动',
+          detail:
+            '您可以通过以下步骤手动设置：\n1. 打开任务管理器\n2. 切换到"启动"选项卡\n3. 找到应用并启用',
+          buttons: ['我知道了']
+        })
+      }
+      console.error('Failed to enable auto-launch:', error)
       return false
     }
   }
@@ -59,7 +73,6 @@ class AutoLaunchManager {
   // 切换自启动状态
   async toggle(state) {
     try {
-      console.log('state :>> ', state)
       if (state) {
         await this.enable()
       } else {
@@ -89,7 +102,6 @@ async function AutoLaunchManagerApi() {
 
   // 在 IPC 中处理开关请求
   ipcMain.handle('toggle-auto-launch', async (_event, state) => {
-    console.log('autoLaunch.getState() :>> ', autoLaunch.getState())
     return await autoLaunch.toggle(state)
   })
 

@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   toggleAutoLaunch: (state) => ipcRenderer.invoke('toggle-auto-launch', state),
   /**
    * 获取自启动状态
-   * @returns boolean
+   * @returns {Promise<boolean>} 是否自启动
    */
   getAutoLaunchState: () => ipcRenderer.invoke('get-auto-launch-state')
 })

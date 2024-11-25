@@ -36,8 +36,9 @@ const handleChange = (info: UploadChangeParam) => {
     fileList.value = []
   }
 }
-onMounted(() => {
-  checked.value = window.electronAPI.getAutoLaunchState()
+onMounted(async () => {
+  const state = await window.electronAPI.getAutoLaunchState()
+  checked.value = state
 })
 
 async function handleSwitchChange(checked: boolean) {

@@ -32,7 +32,7 @@ export interface IElectronAPI {
   toggleAutoLaunch: (state: boolean) => Promise<ReturnValue>
   /**
    * 获取自启动状态
-   * @returns {boolean}
+   * @returns {Promise<boolean> }
    */
-  getAutoLaunchState: () => boolean
+  getAutoLaunchState: () => Promise<boolean>
 }

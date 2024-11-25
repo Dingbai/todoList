@@ -10,6 +10,7 @@ import CheckList from '@editorjs/checklist'
 import Marker from '@editorjs/marker'
 import SimpleImage from '@editorjs/simple-image'
 import TextVariantTune from '@editorjs/text-variant-tune'
+import SearchTool from '@/components/searchTool/SearchTool'
 
 const props = defineProps({
   data: {
@@ -49,7 +50,8 @@ const initializeEditor = () => {
       },
       quote: Quote,
       simpleImage: SimpleImage,
-      table: Table
+      table: Table,
+      search: SearchTool
     },
     data: {
       ...props.data,

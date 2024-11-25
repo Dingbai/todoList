@@ -1,27 +1,27 @@
 import require$$0 from "electron";
-import require$$1 from "path";
-import require$$2 from "fs";
+import require$$2 from "path";
+import require$$3 from "fs";
 var main = {};
-const { app: app$1, ipcMain: ipcMain$1 } = require$$0;
-const path$1 = require$$1;
-const fs = require$$2.promises;
-const USER_DATA_PATH = app$1.getPath("userData");
+const { app: app$2, ipcMain: ipcMain$2 } = require$$0;
+const path$1 = require$$2;
+const fs = require$$3.promises;
+const USER_DATA_PATH = app$2.getPath("userData");
 const BACKUP_FILE = path$1.join(USER_DATA_PATH, "localStorage-backup.json");
 function setupDataPersistence$1() {
-  ipcMain$1.handle("backup-local-storage", async (_event, data) => {
+  ipcMain$2.handle("backup-local-storage", async (_event, data) => {
     try {
       await fs.writeFile(BACKUP_FILE, JSON.stringify(data));
       console.log("备份成功");
-      return { success: true };
+      return { success: true, message: "数据备份成功" };
     } catch (error) {
       console.error("备份失败:", error);
       return { success: false, message: `数据备份失败,${error.message}` };
     }
   });
-  ipcMain$1.handle("get-backup-path", async () => {
+  ipcMain$2.handle("get-backup-path", async () => {
     return BACKUP_FILE;
   });
-  ipcMain$1.handle("upload-file", async (_event, path2) => {
+  ipcMain$2.handle("upload-file", async (_event, path2) => {
     try {
       const fileContent = await fs.readFile(path2, "utf8");
       const jsonData = JSON.parse(fileContent);
@@ -39,9 +39,32 @@ function setupDataPersistence$1() {
   });
 }
 var backup = setupDataPersistence$1;
+const { app: app$1, ipcMain: ipcMain$1 } = require$$0;
+function handleSystem$1() {
+  ipcMain$1.handle("set-auto-launch", async (_event, flag) => {
+    try {
+      app$1.setLoginItemSettings({
+        openAtLogin: flag,
+        path: app$1.getPath("exe"),
+        args: ["--hidden"],
+        // 启动参数
+        enabled: true
+      });
+      return { success: true, message: `设置开机自启动成功` };
+    } catch (e) {
+      console.log("e :>> ", e);
+      return { success: false, message: `设置开机自启动失败,${e}` };
+    }
+  });
+  ipcMain$1.handle("get-auto-launch", async () => {
+    return app$1.getLoginItemSettings().openAtLogin;
+  });
+}
+var system = handleSystem$1;
 const { app, BrowserWindow, globalShortcut, ipcMain } = require$$0;
 const setupDataPersistence = backup;
-const path = require$$1;
+const handleSystem = system;
+const path = require$$2;
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
@@ -74,6 +97,7 @@ function createWindow() {
 app.whenReady().then(async () => {
   createWindow();
   setupDataPersistence();
+  handleSystem();
   app.on("activate", function() {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

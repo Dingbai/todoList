@@ -1,5 +1,6 @@
 const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
 const setupDataPersistence = require('./backup/backup.cjs')
+const handleSystem = require('./backup/system.cjs')
 const path = require('path')
 
 // 防止应用退出
@@ -74,6 +75,7 @@ function createWindow() {
 app.whenReady().then(async () => {
   createWindow()
   setupDataPersistence()
+  handleSystem()
   // await ensureConfigExists()
   // createTray()
   app.on('activate', function () {

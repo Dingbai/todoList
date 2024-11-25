@@ -1,3 +1,4 @@
+const { message } = require('ant-design-vue')
 const { app, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs').promises
@@ -13,7 +14,7 @@ function setupDataPersistence() {
     try {
       await fs.writeFile(BACKUP_FILE, JSON.stringify(data))
       console.log('备份成功')
-      return { success: true }
+      return { success: true, message: '数据备份成功' }
     } catch (error) {
       console.error('备份失败:', error)
       return { success: false, message: `数据备份失败,${error.message}` }

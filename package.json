@@ -18,7 +18,8 @@
     "electron:dev": "vite --mode=development",
     "electron:build": "vite build && electron-builder",
     "debug:main": "electron --inspect-brk=9229 ./electron/main.cjs",
-    "build:win": "vite build && electron-builder --win --x64"
+    "build:win": "vite build && electron-builder --win --x64",
+    "build:mac": "electron-builder --mac"
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",

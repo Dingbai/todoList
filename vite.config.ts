@@ -22,7 +22,7 @@ export default defineConfig({
       ]
     }),
     electron({
-      entry: 'electron/main.cjs'
+      entry: 'electron/main.js'
     })
   ],
   resolve: {

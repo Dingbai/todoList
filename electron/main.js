@@ -1,7 +1,10 @@
-const { app, BrowserWindow, globalShortcut } = require('electron')
-const setupDataPersistenceApi = require('./api/backup/backup.cjs')
-const AutoLaunchManagerApi = require('./api/autoLaunchManager/autoLaunchManager.cjs')
-const path = require('path')
+import { app, BrowserWindow, globalShortcut } from 'electron'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import setupDataPersistenceApi from './api/backup/backup.js'
+import AutoLaunchManagerApi from './api/autoLaunchManager/autoLaunchManager.js'
+import handleQuit from './system/quit/quit.js'
+import createTray from './system/tray/tray.js'
 
 // 防止应用退出
 app.on('window-all-closed', () => {
@@ -9,6 +12,9 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 let mainWindow
 function createWindow() {
   // const splash = new BrowserWindow({
@@ -27,7 +33,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
-      preload: path.join(__dirname, 'api/preload.cjs')
+      preload: path.join(__dirname, 'api/preload.js')
     },
     webContents: {
       openDevTools: true
@@ -40,6 +46,8 @@ function createWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
   }
+
+  createTray(mainWindow)
 
   mainWindow.once('ready-to-show', () => {
     // 先将主窗口显示在启动窗口下方
@@ -66,12 +74,15 @@ function createWindow() {
 
   // centerWindow(splash)
   // centerWindow(mainWindow)
+  mainWindow.on('close', (event) => {
+    event.preventDefault()
+    handleQuit(mainWindow)
+  })
 }
 
 // ipcMain.on('dom-ready', () => {
 //   console.log('dom-ready')
 // })
-
 app.whenReady().then(async () => {
   createWindow()
   setupDataPersistenceApi()

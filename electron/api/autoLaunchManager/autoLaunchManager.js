@@ -1,5 +1,5 @@
-const { app, ipcMain } = require('electron')
-const AutoLaunch = require('auto-launch')
+import { app, ipcMain } from 'electron'
+import AutoLaunch from 'auto-launch'
 
 class AutoLaunchManager {
   constructor(options = {}) {
@@ -111,4 +111,4 @@ async function AutoLaunchManagerApi() {
   })
 }
 
-module.exports = AutoLaunchManagerApi
+export default AutoLaunchManagerApi

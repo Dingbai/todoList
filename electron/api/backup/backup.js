@@ -1,6 +1,6 @@
-const { app, ipcMain } = require('electron')
-const path = require('path')
-const fs = require('fs').promises
+import { app, ipcMain } from 'electron'
+import path from 'path'
+import { promises as fs } from 'fs'
 
 // 获取用户数据目录
 const USER_DATA_PATH = app.getPath('userData')
@@ -45,4 +45,5 @@ function setupDataPersistenceApi() {
   })
 }
 
-module.exports = setupDataPersistenceApi
+// module.exports = setupDataPersistenceApi
+export default setupDataPersistenceApi

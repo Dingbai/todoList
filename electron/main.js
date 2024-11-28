@@ -3,15 +3,10 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import setupDataPersistenceApi from './api/backup/backup.js'
 import AutoLaunchManagerApi from './api/autoLaunchManager/autoLaunchManager.js'
+import handleQuitApi from './api/quit/quitApi.js'
 import handleQuit from './system/quit/quit.js'
 import createTray from './system/tray/tray.js'
 
-// 防止应用退出
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -33,7 +28,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
-      preload: path.join(__dirname, 'api/preload.js')
+      preload: path.join(__dirname, 'api/preload.cjs')
     },
     webContents: {
       openDevTools: true
@@ -47,7 +42,7 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
   }
 
-  createTray(mainWindow)
+  const tray = createTray(mainWindow)
 
   mainWindow.once('ready-to-show', () => {
     // 先将主窗口显示在启动窗口下方
@@ -76,7 +71,7 @@ function createWindow() {
   // centerWindow(mainWindow)
   mainWindow.on('close', (event) => {
     event.preventDefault()
-    handleQuit(mainWindow)
+    handleQuit(mainWindow, tray)
   })
 }
 
@@ -87,6 +82,7 @@ app.whenReady().then(async () => {
   createWindow()
   setupDataPersistenceApi()
   AutoLaunchManagerApi()
+  handleQuitApi()
   // await ensureConfigExists()
   // createTray()
   app.on('activate', function () {

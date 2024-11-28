@@ -6,8 +6,9 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 let tray = null
+const iconPath = path.join(__dirname, 'icon.png')
+
 function createTray(mainWindow) {
-  const iconPath = path.join(__dirname, 'icon.png')
   tray = new Tray(iconPath)
 
   const contextMenu = Menu.buildFromTemplate([
@@ -27,6 +28,7 @@ function createTray(mainWindow) {
   tray.setToolTip('todoList')
   tray.setContextMenu(contextMenu)
   tray.on('double-click', () => mainWindow.show())
+  return tray
 }
 
 export default createTray

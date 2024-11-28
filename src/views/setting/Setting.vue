@@ -28,6 +28,7 @@ const data = ref('')
 const visible = ref(false)
 const previewData = ref<OutputData>({ blocks: [] })
 const checked = ref(false)
+const windowCloseOption = ref('ask')
 
 const handleChange = (info: UploadChangeParam) => {
   const isJson = info.file.type === 'application/json'
@@ -39,6 +40,8 @@ const handleChange = (info: UploadChangeParam) => {
 onMounted(async () => {
   const state = await window.electronAPI.getAutoLaunchState()
   checked.value = state
+  const option = await window.electronAPI.getQuitAction()
+  windowCloseOption.value = option
 })
 
 async function handleSwitchChange(checked: boolean) {
@@ -146,11 +149,30 @@ const copy = (text: string) => {
     message.success('复制成功')
   })
 }
+const handleWindowOptionChange = () => {
+  window.electronAPI.setQuitAction(windowCloseOption.value)
+}
 </script>
 <template>
   <div class="setting-container">
     <div class="setting-content">
       <h1>setting</h1>
+      <a-row>
+        <a-col :span="3">
+          <div class="label">窗口关闭选项</div>
+        </a-col>
+        <a-col :span="10">
+          <a-radio-group
+            v-model:value="windowCloseOption"
+            name="radioGroup"
+            @change="handleWindowOptionChange"
+          >
+            <a-radio value="ask">询问</a-radio>
+            <a-radio value="quit">直接关闭</a-radio>
+            <a-radio value="minimize">最小化到托盘</a-radio>
+          </a-radio-group>
+        </a-col>
+      </a-row>
       <a-row>
         <a-col :span="3">
           <div class="label">开机自启动</div>

@@ -35,4 +35,15 @@ export interface IElectronAPI {
    * @returns {Promise<boolean> }
    */
   getAutoLaunchState: () => Promise<boolean>
+  /**
+   * 获取退出状态
+   * @returns {Promise<string>} 退出行为
+   */
+  getQuitAction: () => Promise<string>
+  /**
+   * 设置退出状态
+   * @param {*} action
+   * @returns
+   */
+  setQuitAction: (action: string) => void
 }

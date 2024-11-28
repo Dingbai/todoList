@@ -9,7 +9,7 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var _validator, _encryptionKey, _options, _defaultValues;
-import electron, { app as app$1, ipcMain, shell, dialog, Tray, Menu, BrowserWindow, globalShortcut } from "electron";
+import electron, { app as app$1, ipcMain, shell, dialog, BrowserWindow, Tray, Menu, globalShortcut } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import require$$0$2, { promises } from "fs";
@@ -10971,18 +10971,18 @@ class Conf {
     const fileExtension = options.fileExtension ? `.${options.fileExtension}` : "";
     this.path = path$1.resolve(options.cwd, `${options.configName ?? "config"}${fileExtension}`);
     const fileStore = this.store;
-    const store = Object.assign(createPlainObject(), options.defaults, fileStore);
+    const store2 = Object.assign(createPlainObject(), options.defaults, fileStore);
     if (options.migrations) {
       if (!options.projectVersion) {
         throw new Error("Please specify the `projectVersion` option.");
       }
       this._migrate(options.migrations, options.projectVersion, options.beforeEachMigration);
     }
-    this._validate(store);
+    this._validate(store2);
     try {
-      assert.deepEqual(fileStore, store);
+      assert.deepEqual(fileStore, store2);
     } catch {
-      this.store = store;
+      this.store = store2;
     }
     if (options.watch) {
       this._watch();
@@ -10992,8 +10992,8 @@ class Conf {
     if (__privateGet(this, _options).accessPropertiesByDotNotation) {
       return this._get(key, defaultValue);
     }
-    const { store } = this;
-    return key in store ? store[key] : defaultValue;
+    const { store: store2 } = this;
+    return key in store2 ? store2[key] : defaultValue;
   }
   set(key, value) {
     if (typeof key !== "string" && typeof key !== "object") {
@@ -11005,13 +11005,13 @@ class Conf {
     if (this._containsReservedKey(key)) {
       throw new TypeError(`Please don't use the ${INTERNAL_KEY} key, as it's used to manage this module internal operations.`);
     }
-    const { store } = this;
+    const { store: store2 } = this;
     const set = (key2, value2) => {
       checkValueType(key2, value2);
       if (__privateGet(this, _options).accessPropertiesByDotNotation) {
-        setProperty(store, key2, value2);
+        setProperty(store2, key2, value2);
       } else {
-        store[key2] = value2;
+        store2[key2] = value2;
       }
     };
     if (typeof key === "object") {
@@ -11022,7 +11022,7 @@ class Conf {
     } else {
       set(key, value);
     }
-    this.store = store;
+    this.store = store2;
   }
   /**
       Check if an item exists.
@@ -11050,13 +11050,13 @@ class Conf {
     }
   }
   delete(key) {
-    const { store } = this;
+    const { store: store2 } = this;
     if (__privateGet(this, _options).accessPropertiesByDotNotation) {
-      deleteProperty(store, key);
+      deleteProperty(store2, key);
     } else {
-      delete store[key];
+      delete store2[key];
     }
-    this.store = store;
+    this.store = store2;
   }
   /**
       Delete all items.
@@ -11279,9 +11279,9 @@ class Conf {
     return getProperty(this.store, key, defaultValue);
   }
   _set(key, value) {
-    const { store } = this;
-    setProperty(store, key, value);
-    this.store = store;
+    const { store: store2 } = this;
+    setProperty(store2, key, value);
+    this.store = store2;
   }
 }
 _validator = new WeakMap();
@@ -11343,17 +11343,40 @@ class ElectronStore extends Conf {
     }
   }
 }
-async function handleQuit(mainWindow2) {
-  const store = new ElectronStore({
-    name: "app-preferences",
-    defaults: {
-      rememberChoice: false,
-      quitAction: "ask"
-    }
+const store = new ElectronStore({
+  name: "app-preferences",
+  defaults: {
+    quitAction: "ask"
+    // ask, quit, minimize
+  }
+});
+function handleQuitApi() {
+  ipcMain.handle("get-quit-action", () => {
+    return store.get("quitAction");
   });
+  ipcMain.handle("set-quit-action", (_event, action) => {
+    store.set("quitAction", action);
+  });
+}
+function quitApp(tray2) {
+  try {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      if (!window.isDestroyed()) {
+        window.destroy();
+      }
+    });
+    if (tray2) {
+      tray2.destroy();
+    }
+    app$1.quit();
+  } catch (e) {
+    app$1.exit(0);
+  }
+}
+async function handleQuit(mainWindow2, tray2) {
   const preferences = store.get("quitAction");
   if (preferences === "quit") {
-    app$1.quit();
+    quitApp(tray2);
     return;
   }
   if (preferences === "minimize") {
@@ -11362,42 +11385,38 @@ async function handleQuit(mainWindow2) {
   }
   const { response } = await dialog.showMessageBox(mainWindow2, {
     type: "question",
-    buttons: ["退出应用", "最小化到托盘", "取消"],
-    defaultId: 2,
-    cancelId: 2,
+    buttons: ["退出应用", "最小化到托盘"],
+    cancelId: -1,
     title: "退出确认",
     message: "你想要怎么处理应用程序？",
-    checkboxLabel: "记住我的选择",
-    checkboxChecked: false,
     noLink: true
   });
   switch (response) {
     case 0:
       const { response: quitResponse } = await dialog.showMessageBox(mainWindow2, {
         type: "question",
-        buttons: ["记住并退出", "仅此一次", "取消"],
-        defaultId: 0,
-        cancelId: 2,
+        buttons: ["记住并退出", "仅此一次"],
+        cancelId: -1,
         title: "记住选择",
         message: "是否记住退出选择？",
         noLink: true
       });
+      if (quitResponse === -1) return;
       if (quitResponse === 0) {
         store.set("quitAction", "quit");
       }
-      app$1.isQuiting = true;
-      app$1.quit();
+      quitApp(tray2);
       break;
     case 1:
       const { response: minimizeResponse } = await dialog.showMessageBox(mainWindow2, {
         type: "question",
-        buttons: ["记住并最小化", "仅此一次", "取消"],
-        defaultId: 0,
-        cancelId: 2,
+        buttons: ["记住并最小化", "仅此一次"],
+        cancelId: -1,
         title: "记住选择",
         message: "是否记住最小化选择？",
         noLink: true
       });
+      if (minimizeResponse === -1) return;
       if (minimizeResponse === 0) {
         store.set("quitAction", "minimize");
       }
@@ -11408,8 +11427,8 @@ async function handleQuit(mainWindow2) {
 const __filename$1 = fileURLToPath(import.meta.url);
 const __dirname$1 = path.dirname(__filename$1);
 let tray = null;
+const iconPath = path.join(__dirname$1, "icon.png");
 function createTray(mainWindow2) {
-  const iconPath = path.join(__dirname$1, "icon.png");
   tray = new Tray(iconPath);
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -11427,12 +11446,8 @@ function createTray(mainWindow2) {
   tray.setToolTip("todoList");
   tray.setContextMenu(contextMenu);
   tray.on("double-click", () => mainWindow2.show());
+  return tray;
 }
-app$1.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app$1.quit();
-  }
-});
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 let mainWindow;
@@ -11444,7 +11459,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
-      preload: path.join(__dirname, "api/preload.js")
+      preload: path.join(__dirname, "api/preload.cjs")
     },
     webContents: {
       openDevTools: true
@@ -11455,19 +11470,20 @@ function createWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
   }
-  createTray(mainWindow);
+  const tray2 = createTray(mainWindow);
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
   });
   mainWindow.on("close", (event) => {
     event.preventDefault();
-    handleQuit(mainWindow);
+    handleQuit(mainWindow, tray2);
   });
 }
 app$1.whenReady().then(async () => {
   createWindow();
   setupDataPersistenceApi();
   AutoLaunchManagerApi();
+  handleQuitApi();
   app$1.on("activate", function() {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

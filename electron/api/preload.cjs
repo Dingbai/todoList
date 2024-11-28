@@ -28,7 +28,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
    * 获取自启动状态
    * @returns {Promise<boolean>} 是否自启动
    */
-  getAutoLaunchState: () => ipcRenderer.invoke('get-auto-launch-state')
+  getAutoLaunchState: () => ipcRenderer.invoke('get-auto-launch-state'),
+  /**
+   * 获取退出状态
+   * @returns {Promise<string>} 退出行为
+   */
+  getQuitAction: () => ipcRenderer.invoke('get-quit-action'),
+  /**
+   * 设置退出状态
+   * @param {*} action
+   * @returns
+   */
+  setQuitAction: (action) => ipcRenderer.invoke('set-quit-action', action)
 })
 
 // // 设置一个标志，确保代码只执行一次

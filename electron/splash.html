@@ -3,41 +3,82 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Splash Screen</title>
+  <title>Loading</title>
   <style>
-    body,
-    html {
-      width: 100%;
+    html,
+    body {
+      margin: 0;
+      padding: 0;
       height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #282c34;
-      margin: 0;
-      color: white;
-      font-size: 24px;
+      background-color: #f4f4f4;
+      font-family: 'Arial', sans-serif;
     }
 
-    .logo {
-      animation: fadeIn 2s ease-in-out;
-      font-size: 100px;
+    .loader {
+      width: 250px;
+      height: 4px;
+      background-color: #e0e0e0;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
+    .loader-progress {
+      position: absolute;
+      height: 100%;
+      background: linear-gradient(to right, #4CAF50, #81c784);
+      border-radius: 2px;
+      animation: loading 1.5s infinite;
+    }
+
+    .loader-text {
+      margin-top: 20px;
+      color: #666;
+      font-size: 16px;
+      position: absolute;
+      top: 100%;
+    }
+
+    @keyframes loading {
+      0% {
+        width: 0;
+        left: -50%;
       }
 
-      to {
-        opacity: 1;
+      50% {
+        width: 100%;
+        left: 100%;
+      }
+
+      100% {
+        width: 0;
+        left: 100%;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="logo">Loading...</div>
+  <div>
+    <div class="loader">
+      <div id="progress" class="loader-progress"></div>
+    </div>
+    <div class="loader-text">正在加载...</div>
+  </div>
+
+  <script>
+    window.electronAPI.onInitProgress((data) => {
+      const progressEl = document.getElementById('progress')
+      if (progressEl) {
+        progressEl.style.width = `${data.progress}%`
+      }
+    })
+
+    window.electronAPI.sendAppReady()
+  </script>
 </body>
 
 </html>

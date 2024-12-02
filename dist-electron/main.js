@@ -9,7 +9,7 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var _validator, _encryptionKey, _options, _defaultValues;
-import electron, { app as app$1, ipcMain, shell, dialog, BrowserWindow, Tray, Menu, globalShortcut } from "electron";
+import electron, { app as app$1, ipcMain, shell, dialog, BrowserWindow, Tray, Menu, globalShortcut, screen } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import require$$0$2, { promises } from "fs";
@@ -11450,8 +11450,27 @@ function createTray(mainWindow2) {
 }
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+function createAnimationFrame() {
+  return (callback) => {
+    setTimeout(() => {
+      callback(Date.now());
+    }, 1e3 / 60);
+  };
+}
+const requestAnimationFrame = createAnimationFrame();
 let mainWindow;
 function createWindow() {
+  const splash = new BrowserWindow({
+    width: 1e3,
+    height: 800,
+    frame: false,
+    // 去掉窗口边框
+    transparent: true,
+    // 窗口透明
+    webContents: {
+      openDevTools: true
+    }
+  });
   mainWindow = new BrowserWindow({
     width: 1e3,
     height: 800,
@@ -11465,6 +11484,8 @@ function createWindow() {
       openDevTools: true
     }
   });
+  splash.loadFile(path.join(__dirname, "splash.html"));
+  splash.show();
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
@@ -11472,8 +11493,48 @@ function createWindow() {
   }
   const tray2 = createTray(mainWindow);
   mainWindow.once("ready-to-show", () => {
-    mainWindow.show();
+    splash.setOpacity(1);
+    mainWindow.setOpacity(0);
+    const easeInOut = (t2) => t2 < 0.5 ? 2 * t2 * t2 : -1 + (4 - 2 * t2) * t2;
+    let startTime = null;
+    const duration = 1e3;
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const opacity = 1 - easeInOut(progress);
+      splash.setOpacity(opacity);
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        splash.close();
+        startTime = null;
+        animateMainWindow(currentTime);
+      }
+    };
+    const animateMainWindow = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const opacity = easeInOut(progress);
+      mainWindow.setOpacity(opacity);
+      mainWindow.show();
+      if (progress < 1) {
+        requestAnimationFrame(animateMainWindow);
+      }
+    };
+    requestAnimationFrame(animate);
   });
+  const centerWindow = (window) => {
+    const { width, height } = window.getBounds();
+    const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
+    window.setBounds({
+      x: Math.floor(screenWidth / 2 - width / 2),
+      y: Math.floor(screenHeight / 2 - height / 2)
+    });
+  };
+  centerWindow(splash);
+  centerWindow(mainWindow);
   mainWindow.on("close", (event) => {
     event.preventDefault();
     handleQuit(mainWindow, tray2);

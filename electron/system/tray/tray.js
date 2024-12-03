@@ -1,34 +1,43 @@
-import { Tray, Menu } from 'electron'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+import { Tray, Menu, nativeImage } from 'electron'
+import utils from '../../utils/index.js'
 
 let tray = null
-const iconPath = path.join(__dirname, 'icon.png')
 
 function createTray(mainWindow) {
-  tray = new Tray(iconPath)
+  try {
+    const trayIconPath = utils.getPlatformIcon('tray')
+    console.log('trayIcon :>> ', trayIconPath)
+    const trayIcon = nativeImage.createFromPath(trayIconPath)
+    console.log('trayIcon.empty() :>> ', trayIcon.isEmpty())
+    const resizedIcon = trayIcon.resize({
+      width: 16,
+      height: 16,
+      quality: 'better'
+    })
+    tray = new Tray(resizedIcon)
 
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: '打开主应用',
-      click: () => mainWindow.show()
-    },
-    {
-      label: '退出应用',
-      click: () => {
-        app.isQuiting = true
-        app.quit()
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: '打开主应用',
+        click: () => mainWindow.show()
+      },
+      {
+        label: '退出应用',
+        click: () => {
+          app.isQuiting = true
+          app.quit()
+        }
       }
-    }
-  ])
+    ])
 
-  tray.setToolTip('todoList')
-  tray.setContextMenu(contextMenu)
-  tray.on('double-click', () => mainWindow.show())
-  return tray
+    tray.setToolTip('todoList')
+    tray.setContextMenu(contextMenu)
+    tray.on('double-click', () => mainWindow.show())
+    return tray
+  } catch (e) {
+    console.log('createTray error :>> ', e)
+    return null
+  }
 }
 
 export default createTray

@@ -9,7 +9,7 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var _validator, _encryptionKey, _options, _defaultValues;
-import electron, { app as app$1, ipcMain, shell, dialog, BrowserWindow, Tray, Menu, globalShortcut, screen } from "electron";
+import electron, { app as app$1, ipcMain, shell, dialog, BrowserWindow, nativeImage, Tray, Menu, globalShortcut, screen } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import require$$0$2, { promises } from "fs";
@@ -5043,7 +5043,7 @@ function recomposeAuthority$1(components, options) {
   }
   return uriTokens.length ? uriTokens.join("") : void 0;
 }
-var utils = {
+var utils$1 = {
   recomposeAuthority: recomposeAuthority$1,
   normalizeComponentEncoding: normalizeComponentEncoding$1,
   removeDotSegments: removeDotSegments$1,
@@ -5190,7 +5190,7 @@ const SCHEMES$1 = {
   "urn:uuid": urnuuid
 };
 var schemes = SCHEMES$1;
-const { normalizeIPv6, normalizeIPv4, removeDotSegments, recomposeAuthority, normalizeComponentEncoding } = utils;
+const { normalizeIPv6, normalizeIPv4, removeDotSegments, recomposeAuthority, normalizeComponentEncoding } = utils$1;
 const SCHEMES = schemes;
 function normalize(uri2, options) {
   if (typeof uri2 === "string") {
@@ -11426,27 +11426,63 @@ async function handleQuit(mainWindow2, tray2) {
 }
 const __filename$1 = fileURLToPath(import.meta.url);
 const __dirname$1 = path.dirname(__filename$1);
+const assetsPath = path.join(__dirname$1, "..", "assets");
+const platformIcons = {
+  darwin: {
+    app: path.join(assetsPath, "icons", "macos", "app-icon.icns"),
+    tray: path.join(assetsPath, "icons", "macos", "tray-icon.png")
+  },
+  win32: {
+    app: path.join(assetsPath, "icons", "windows", "app-icon.ico"),
+    tray: path.join(assetsPath, "icons", "windows", "tray-icon.ico")
+  }
+};
+function getPlatformIcon(type2) {
+  const platform = require$$0$3.platform();
+  const platformIconMap = {
+    darwin: platformIcons.darwin,
+    win32: platformIcons.win32
+  };
+  const icons = platformIconMap[platform];
+  return icons[type2];
+}
+const utils = {
+  getPlatformIcon
+};
 let tray = null;
-const iconPath = path.join(__dirname$1, "icon.png");
 function createTray(mainWindow2) {
-  tray = new Tray(iconPath);
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "打开主应用",
-      click: () => mainWindow2.show()
-    },
-    {
-      label: "退出应用",
-      click: () => {
-        app.isQuiting = true;
-        app.quit();
+  try {
+    const trayIconPath = utils.getPlatformIcon("tray");
+    console.log("trayIcon :>> ", trayIconPath);
+    const trayIcon = nativeImage.createFromPath(trayIconPath);
+    console.log("trayIcon.empty() :>> ", trayIcon.isEmpty());
+    const resizedIcon = trayIcon.resize({
+      width: 16,
+      height: 16,
+      quality: "better"
+    });
+    tray = new Tray(resizedIcon);
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: "打开主应用",
+        click: () => mainWindow2.show()
+      },
+      {
+        label: "退出应用",
+        click: () => {
+          app.isQuiting = true;
+          app.quit();
+        }
       }
-    }
-  ]);
-  tray.setToolTip("todoList");
-  tray.setContextMenu(contextMenu);
-  tray.on("double-click", () => mainWindow2.show());
-  return tray;
+    ]);
+    tray.setToolTip("todoList");
+    tray.setContextMenu(contextMenu);
+    tray.on("double-click", () => mainWindow2.show());
+    return tray;
+  } catch (e) {
+    console.log("createTray error :>> ", e);
+    return null;
+  }
 }
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11460,9 +11496,11 @@ function createAnimationFrame() {
 const requestAnimationFrame = createAnimationFrame();
 let mainWindow;
 function createWindow() {
+  const iconPath = utils.getPlatformIcon("app");
   const splash = new BrowserWindow({
     width: 1e3,
     height: 800,
+    icon: iconPath,
     frame: false,
     // 去掉窗口边框
     transparent: true,
@@ -11475,6 +11513,7 @@ function createWindow() {
     width: 1e3,
     height: 800,
     show: false,
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,

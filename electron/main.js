@@ -6,6 +6,7 @@ import AutoLaunchManagerApi from './api/autoLaunchManager/autoLaunchManager.js'
 import handleQuitApi from './api/quit/quitApi.js'
 import handleQuit from './system/quit/quit.js'
 import createTray from './system/tray/tray.js'
+import utils from './utils/index.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -22,11 +23,15 @@ function createAnimationFrame() {
 // 使用自定义的 requestAnimationFrame
 const requestAnimationFrame = createAnimationFrame()
 
+// app.setIcon(path.join(__dirname, 'icon@256.png'))
+
 let mainWindow
 function createWindow() {
+  const iconPath = utils.getPlatformIcon('app')
   const splash = new BrowserWindow({
     width: 1000,
     height: 800,
+    icon: iconPath,
     frame: false, // 去掉窗口边框
     transparent: true, // 窗口透明
     webContents: {
@@ -37,6 +42,7 @@ function createWindow() {
     width: 1000,
     height: 800,
     show: false,
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,

@@ -11429,12 +11429,12 @@ const __dirname$1 = path.dirname(__filename$1);
 const assetsPath = path.join(__dirname$1, "..", "assets");
 const platformIcons = {
   darwin: {
-    app: path.join(assetsPath, "icons", "macos", "app-icon.icns"),
+    app: path.join(assetsPath, "icons", "macos", "app-icon.png"),
     tray: path.join(assetsPath, "icons", "macos", "tray-icon.png")
   },
   win32: {
-    app: path.join(assetsPath, "icons", "windows", "app-icon.ico"),
-    tray: path.join(assetsPath, "icons", "windows", "tray-icon.ico")
+    app: path.join(assetsPath, "icons", "windows", "app-icon.png"),
+    tray: path.join(assetsPath, "icons", "windows", "tray-icon.png")
   }
 };
 function getPlatformIcon(type2) {
@@ -11453,9 +11453,7 @@ let tray = null;
 function createTray(mainWindow2) {
   try {
     const trayIconPath = utils.getPlatformIcon("tray");
-    console.log("trayIcon :>> ", trayIconPath);
     const trayIcon = nativeImage.createFromPath(trayIconPath);
-    console.log("trayIcon.empty() :>> ", trayIcon.isEmpty());
     const resizedIcon = trayIcon.resize({
       width: 16,
       height: 16,

@@ -6,9 +6,7 @@ let tray = null
 function createTray(mainWindow) {
   try {
     const trayIconPath = utils.getPlatformIcon('tray')
-    console.log('trayIcon :>> ', trayIconPath)
     const trayIcon = nativeImage.createFromPath(trayIconPath)
-    console.log('trayIcon.empty() :>> ', trayIcon.isEmpty())
     const resizedIcon = trayIcon.resize({
       width: 16,
       height: 16,

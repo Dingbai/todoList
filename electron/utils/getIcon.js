@@ -8,12 +8,12 @@ const assetsPath = path.join(__dirname, '..', 'assets')
 
 const platformIcons = {
   darwin: {
-    app: path.join(assetsPath, 'icons', 'macos', 'app-icon.icns'),
+    app: path.join(assetsPath, 'icons', 'macos', 'app-icon.png'),
     tray: path.join(assetsPath, 'icons', 'macos', 'tray-icon.png')
   },
   win32: {
-    app: path.join(assetsPath, 'icons', 'windows', 'app-icon.ico'),
-    tray: path.join(assetsPath, 'icons', 'windows', 'tray-icon.ico')
+    app: path.join(assetsPath, 'icons', 'windows', 'app-icon.png'),
+    tray: path.join(assetsPath, 'icons', 'windows', 'tray-icon.png')
   }
 }
 

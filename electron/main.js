@@ -23,8 +23,6 @@ function createAnimationFrame() {
 // 使用自定义的 requestAnimationFrame
 const requestAnimationFrame = createAnimationFrame()
 
-// app.setIcon(path.join(__dirname, 'icon@256.png'))
-
 let mainWindow
 function createWindow() {
   const iconPath = utils.getPlatformIcon('app')

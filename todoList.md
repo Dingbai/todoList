@@ -15,5 +15,6 @@
 
 1.  新增 最小化时询问是关闭还是缩小到托盘 done
 2.  新增 首屏加载动画 done
-3.  fix 打包之后刷新页面，路由异常 done
-4.  fix 默认路由异常，期待 main，实际为空 done
+3.  新增 app图标 tray图标 done
+4.  fix 打包之后刷新页面，路由异常 done
+5.  fix 默认路由异常，期待 main，实际为空 done

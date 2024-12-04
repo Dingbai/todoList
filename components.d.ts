@@ -30,6 +30,7 @@ declare module 'vue' {
     ASwitch: typeof import('ant-design-vue/es')['Switch']
     AUploadDragger: typeof import('ant-design-vue/es')['UploadDragger']
     CheckboxItem: typeof import('./src/components/sideContent/checkboxItem/CheckboxItem.vue')['default']
+    Column: typeof import('./src/components/column/Column.vue')['default']
     Content: typeof import('./src/components/content/Content.vue')['default']
     Editor: typeof import('./src/components/editor/Editor.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']

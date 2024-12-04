@@ -10,6 +10,7 @@ import {
   CopyOutlined
 } from '@ant-design/icons-vue'
 import { type OutputData } from '@editorjs/editorjs'
+import Column from '@/components/column/Column.vue'
 
 import { LocalStorageManager } from '@/utils/backup'
 import { JsonViewer } from 'vue3-json-viewer'
@@ -158,10 +159,7 @@ const handleWindowOptionChange = () => {
     <div class="setting-content">
       <h1>setting</h1>
       <a-row>
-        <a-col :span="3">
-          <div class="label">窗口关闭选项</div>
-        </a-col>
-        <a-col :span="10">
+        <Column label="窗口关闭选项" :labelCol="{ span: 3 }">
           <a-radio-group
             v-model:value="windowCloseOption"
             name="radioGroup"
@@ -171,39 +169,28 @@ const handleWindowOptionChange = () => {
             <a-radio value="quit">直接关闭</a-radio>
             <a-radio value="minimize">最小化到托盘</a-radio>
           </a-radio-group>
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="3">
-          <div class="label">开机自启动</div>
-        </a-col>
-        <a-col :span="10">
+        </Column>
+        <Column label="开机自启动" :labelCol="{ span: 3 }">
           <a-switch v-model:checked="checked" @change="handleSwitchChange" />
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="3">
-          <div class="backup label">
-            数据备份
-            <a-popover placement="bottomLeft">
-              <template #content>
-                <div>
-                  备份路径：{{ backupPath }}<CopyOutlined class="copy" @click="copy(backupPath)" />
-                </div>
-              </template>
-              <InfoCircleOutlined />
-            </a-popover>
-          </div>
-        </a-col>
-        <a-col :span="10">
+        </Column>
+        <Column :labelCol="{ span: 3 }">
+          <template #label>
+            <div class="backup label">
+              数据备份
+              <a-popover placement="bottomLeft">
+                <template #content>
+                  <div>
+                    备份路径：{{ backupPath }}
+                    <CopyOutlined class="copy" @click="copy(backupPath)" />
+                  </div>
+                </template>
+                <InfoCircleOutlined />
+              </a-popover>
+            </div>
+          </template>
           <a-button type="primary" @click="backup">备份</a-button>
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="3">
-          <div class="label">数据恢复</div>
-        </a-col>
-        <a-col :span="10">
+        </Column>
+        <Column label="数据恢复" :labelCol="{ span: 3 }">
           <a-upload-dragger
             v-model:fileList="fileList"
             name="file"
@@ -233,7 +220,7 @@ const handleWindowOptionChange = () => {
               </template>
             </a-list>
           </div>
-        </a-col>
+        </Column>
       </a-row>
     </div>
     <a-modal v-model:open="visible" title="数据预览/恢复" @ok="handleOk" centered>
@@ -270,14 +257,7 @@ const handleWindowOptionChange = () => {
   font-size: 16px;
   .setting-content {
     :deep(.ant-row) {
-      margin-top: 10px;
-      .ant-col {
-        > .label {
-          display: flex;
-          justify-content: flex-end;
-          padding-right: 8px;
-        }
-      }
+      margin-top: 16px;
     }
     .backup {
       align-items: center;

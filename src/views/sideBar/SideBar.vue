@@ -83,7 +83,7 @@ const goPath = (path: string) => {
     }
   }
   .menu-list {
-    padding: 20px 0;
+    padding-top: 20px;
     flex: 1;
     .layout;
     .menu-item {

@@ -11495,10 +11495,11 @@ const requestAnimationFrame = createAnimationFrame();
 let mainWindow;
 function createWindow() {
   const iconPath = utils.getPlatformIcon("app");
+  const appIcon = nativeImage.createFromPath(iconPath);
   const splash = new BrowserWindow({
     width: 1e3,
     height: 800,
-    icon: iconPath,
+    icon: appIcon,
     frame: false,
     // 去掉窗口边框
     transparent: true,
@@ -11511,7 +11512,7 @@ function createWindow() {
     width: 1e3,
     height: 800,
     show: false,
-    icon: iconPath,
+    icon: appIcon,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, screen } from 'electron'
+import { app, BrowserWindow, globalShortcut, screen, nativeImage } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import setupDataPersistenceApi from './api/backup/backup.js'
@@ -26,10 +26,11 @@ const requestAnimationFrame = createAnimationFrame()
 let mainWindow
 function createWindow() {
   const iconPath = utils.getPlatformIcon('app')
+  const appIcon = nativeImage.createFromPath(iconPath)
   const splash = new BrowserWindow({
     width: 1000,
     height: 800,
-    icon: iconPath,
+    icon: appIcon,
     frame: false, // 去掉窗口边框
     transparent: true, // 窗口透明
     webContents: {
@@ -40,7 +41,7 @@ function createWindow() {
     width: 1000,
     height: 800,
     show: false,
-    icon: iconPath,
+    icon: appIcon,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,

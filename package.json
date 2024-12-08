@@ -49,7 +49,8 @@
     "uuid": "^10.0.0",
     "vue": "^3.4.34",
     "vue-router": "^4.4.0",
-    "vue3-json-viewer": "^2.2.2"
+    "vue3-json-viewer": "^2.2.2",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.10.3",

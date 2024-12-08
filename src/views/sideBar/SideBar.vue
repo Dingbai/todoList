@@ -2,8 +2,8 @@
 import {
   SettingFilled,
   QuestionCircleOutlined,
-  CheckSquareOutlined,
-  CalendarOutlined
+  CheckSquareOutlined
+  // CalendarOutlined
 } from '@ant-design/icons-vue'
 import { ref } from 'vue'
 import type { Component } from 'vue'
@@ -23,11 +23,11 @@ const MenuList = ref<MenuItem[]>([
     icon: CheckSquareOutlined,
     label: 'Todo'
   },
-  {
-    name: 'calendar',
-    icon: CalendarOutlined,
-    label: 'Calendar'
-  },
+  // {
+  //   name: 'calendar',
+  //   icon: CalendarOutlined,
+  //   label: 'Calendar'
+  // },
   {
     name: 'setting',
     icon: SettingFilled,

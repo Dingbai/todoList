@@ -5,6 +5,6 @@ export interface Data {
   id: string
   created: string
   status: 'done' | 'doing'
-  actived?: boolean,
+  actived?: boolean
   selected?: boolean
 }

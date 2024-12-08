@@ -42,6 +42,9 @@ const handleAdd = () => {
 const getCount = (status: string) => {
   return dataStore.value.filter((item) => item.status === status).length
 }
+const getCheckboxList = (status: string) => {
+  return dataStore.value.filter((item) => item.status === status)
+}
 </script>
 
 <template>
@@ -61,7 +64,7 @@ const getCount = (status: string) => {
             <span class="header">{{ getCount(item.status) }}</span>
           </span>
         </template>
-        <CheckboxItem :status="item.status" />
+        <CheckboxItem :status="item.status" :source="getCheckboxList(item.status)" />
       </a-collapse-panel>
     </a-collapse>
   </div>
@@ -85,7 +88,7 @@ const getCount = (status: string) => {
       padding-left: 0;
     }
     .ant-collapse-content-box {
-      padding-top: 0;
+      padding: 0;
     }
     .header {
       color: #bdbdbd;

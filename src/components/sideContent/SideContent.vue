@@ -1,19 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useDataStore } from '@/stores/update'
 import CheckboxItem from '@/components/sideContent/checkboxItem/CheckboxItem.vue'
 import moment from 'moment'
+import type { Data } from '@/types'
 
 const dataStore = useDataStore()
 const task = ref('')
 const currentId = ref(dataStore.currentItem?.id || '')
 
 const activeKey = ref(['1'])
+const listMap = ref<{ [x: string]: Data[] }>({
+  todo: dataStore.todoList,
+  done: dataStore.doneList
+})
 const panelData = [
   {
     key: '1',
     title: '正在进行',
-    status: 'doing'
+    status: 'todo'
   },
   {
     key: '2',
@@ -22,6 +27,21 @@ const panelData = [
   }
 ]
 
+watch(
+  () => dataStore.todoList,
+  (val) => {
+    listMap.value.todo = val
+  },
+  { deep: true }
+)
+watch(
+  () => dataStore.doneList,
+  (val) => {
+    listMap.value.done = val
+  },
+  { deep: true }
+)
+
 const handleAdd = () => {
   const uuid = crypto.randomUUID()
 
@@ -29,7 +49,7 @@ const handleAdd = () => {
     title: task.value,
     editData: null,
     id: uuid,
-    status: 'doing',
+    status: 'todo',
     actived: false,
     created: moment().format('YYYY-MM-DD HH:mm:ss')
   })
@@ -42,8 +62,30 @@ const handleAdd = () => {
 const getCount = (status: string) => {
   return dataStore.value.filter((item) => item.status === status).length
 }
-const getCheckboxList = (status: string) => {
-  return dataStore.value.filter((item) => item.status === status)
+// const getCheckboxList = (status: string) => {
+//   return dataStore.value.filter((item) => item.status === status)
+// }
+// const handleChange = (e: Event, status: string) => {
+//   const target = e.target as HTMLInputElement
+//   const temp = dataStore.value.map((item) => {
+//     if (target.value === item.id) {
+//       item.status = status === 'todo' ? 'done' : 'todo'
+//     }
+//     // 完成状态所有任务都是选中状态
+//     item.actived = item.status === 'done'
+//     return item
+//   })
+//   dataStore.updateList(status, temp)
+// }
+const handleUpdate = (list: Data[], status: string) => {
+  listMap.value[status] = list
+  // const temp = dataStore.value.map((item) => {
+  //   if (item.status === status) {
+  //     item.actived = list.some((i) => i.id === item.id)
+  //   }
+  //   return item
+  // })
+  // dataStore.updateAllData(temp)
 }
 </script>
 
@@ -64,7 +106,7 @@ const getCheckboxList = (status: string) => {
             <span class="header">{{ getCount(item.status) }}</span>
           </span>
         </template>
-        <CheckboxItem :status="item.status" :source="getCheckboxList(item.status)" />
+        <CheckboxItem :status="item.status" :source="listMap[item.status]" @update="handleUpdate" />
       </a-collapse-panel>
     </a-collapse>
   </div>

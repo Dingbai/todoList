@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, type PropType } from 'vue'
+import { ref, type PropType, watch } from 'vue'
 import { useDataStore } from '@/stores/update'
 import { Empty } from 'ant-design-vue'
 import draggable from 'vuedraggable'
@@ -12,33 +12,43 @@ const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
 const props = defineProps({
   status: {
     type: String,
-    default: 'doing',
-    validator: (val: string) => ['doing', 'done'].includes(val)
+    default: 'todo',
+    validator: (val: string) => ['todo', 'done'].includes(val)
   },
   source: {
     type: Array as PropType<Data[]>,
     default: () => []
   }
 })
+const emit = defineEmits(['change', 'update'])
 
 const dataStore = useDataStore()
-const currentId = ref(dataStore.currentItem?.id || '')
 const imgSrc = ref(draggableImg)
-const list = ref<Data[]>([])
+const currentId = ref(dataStore.currentItem?.id || '')
+const list = ref<Data[]>(props.source)
 
-onMounted(() => {
-  list.value = props.source
-})
+watch(
+  () => props.source,
+  (val) => {
+    if (val.length === 0) {
+      list.value = []
+      return
+    }
+    list.value = val
+  },
+  { immediate: true, deep: true }
+)
 
 const handleSwitch = (id: string) => {
   dataStore.setId(id)
   currentId.value = id
   // 标记选中状态
-  const temp = dataStore.value.map((item) => {
-    item.selected = item.id === id
-    return item
-  })
-  dataStore.updateAllData(temp)
+  // const temp = list.value.map((item) => {
+  //   item.selected = item.id === id
+  //   return item
+  // })
+  // dataStore.updateAllData(temp)
+  // dataStore.updateList(props.status, temp)
 }
 
 const getActivedClass = (id: string) => {
@@ -55,17 +65,22 @@ const handleDelete = (id: string) => {
 }
 const getPopupContainer = () => document.querySelector('.content')
 
-const handleChange = (e: Event) => {
-  const target = e.target as HTMLInputElement
+const handleChange = (id: string) => {
   const temp = dataStore.value.map((item) => {
-    if (target.value === item.id) {
-      item.status = props.status === 'doing' ? 'done' : 'doing'
+    if (id === item.id) {
+      item.status = props.status === 'todo' ? 'done' : 'todo'
     }
     // 完成状态所有任务都是选中状态
     item.actived = item.status === 'done'
     return item
   })
   dataStore.updateAllData(temp)
+}
+
+const handleDragChange = (evt: { moved: boolean }) => {
+  if (evt.moved) {
+    dataStore.updateList(props.status, list.value)
+  }
 }
 </script>
 
@@ -78,7 +93,7 @@ const handleChange = (e: Event) => {
       item-key="id"
       v-model="list"
       :animation="300"
-      @change="handleChange"
+      @change="handleDragChange"
     >
       <template #item="{ element }">
         <div class="list-item" :key="element.id">
@@ -98,7 +113,7 @@ const handleChange = (e: Event) => {
                   <a-checkbox
                     :value="element.id"
                     :checked="element.actived"
-                    @change="handleChange"
+                    @change="handleChange(element.id)"
                   />
                 </a-col>
                 <a-col :span="22">

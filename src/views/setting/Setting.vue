@@ -124,7 +124,7 @@ const restore = async () => {
     const temp = JSON.parse(data.value)
     localStorage.list = temp
     dataStore.updateAllData(temp)
-    const id = temp.filter((item: Data) => item.status === 'doing')?.[0]?.id
+    const id = temp.filter((item: Data) => item.status === 'todo')?.[0]?.id
     if (id) {
       dataStore.setId(id)
     }

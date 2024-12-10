@@ -4,7 +4,7 @@ export interface Data {
   editData: OutputData | null
   id: string
   created: string
-  status: 'done' | 'doing'
+  status: 'done' | 'todo'
   actived?: boolean
   selected?: boolean
 }

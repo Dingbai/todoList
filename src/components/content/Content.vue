@@ -6,11 +6,11 @@ import Editor from '@/components/editor/Editor.vue'
 import { useDataStore } from '@/stores/update'
 
 const title = ref('')
-const searchValue = ref('')
+// const searchValue = ref('')
 const editData = ref<OutputData | null>(null)
 const editorInstance = ref<EditorJS | null>(null)
 const dataStore = useDataStore()
-const top = ref<number>(10)
+// const top = ref<number>(10)
 
 watch(
   () => dataStore.id,

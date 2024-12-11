@@ -10,6 +10,7 @@ import CheckList from '@editorjs/checklist'
 import Marker from '@editorjs/marker'
 import SimpleImage from '@editorjs/simple-image'
 import TextVariantTune from '@editorjs/text-variant-tune'
+import { i18nZhCN } from './config/i18n'
 // import SearchTool from '@/components/searchTool/SearchTool'
 
 const props = defineProps({
@@ -34,6 +35,7 @@ const initializeEditor = () => {
     holder: editorId,
     readOnly: props.config.readOnly,
     inlineToolbar: ['link', 'marker', 'bold', 'italic'],
+    i18n: i18nZhCN,
     tools: {
       header: Header,
       list: List,
@@ -88,10 +90,6 @@ onBeforeUnmount(() => {
 </template>
 <style lang="less" scoped>
 #editorjs-container {
-  // // height: calc(100vh - 60px);
-  // // padding: 0 11px;
-  // box-sizing: border-box;
-  // overflow: auto;
   :deep(.codex-editor__redactor) {
     padding-bottom: 0 !important;
   }

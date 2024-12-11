@@ -82,7 +82,7 @@ const getEditorInstance = (instance: EditorJS) => {
   }
   :deep(#editorjs-container) {
     height: calc(100vh - 60px);
-    padding: 0 10px;
+    padding: 0 10px 0 4px;
     box-sizing: border-box;
     overflow: auto;
   }

@@ -57,6 +57,10 @@ export const i18nZhCN = {
         'Select an Image': '选择图片',
         'paste URL of image': '粘贴图片地址',
         Caption: '图片说明'
+      },
+      quote: {
+        'Align Center': '居中',
+        'Align Left': '左对齐'
       }
     },
 
@@ -70,6 +74,13 @@ export const i18nZhCN = {
       },
       moveDown: {
         'Move down': '下移'
+      },
+
+      convert: {
+        'Convert to': '转换为' // 这里是 `convert to` 的翻译
+      },
+      converter: {
+        'Convert to': '转换为'
       }
     }
   }

@@ -5,11 +5,11 @@ import Header from '@editorjs/header'
 import List from '@editorjs/list'
 import Code from '@editorjs/code'
 import Table from '@editorjs/table'
-import Quote from '@editorjs/quote'
+// import Quote from '@editorjs/quote'
 import CheckList from '@editorjs/checklist'
 import Marker from '@editorjs/marker'
 import SimpleImage from '@editorjs/simple-image'
-import TextVariantTune from '@editorjs/text-variant-tune'
+// import TextVariantTune from '@editorjs/text-variant-tune'
 import { i18nZhCN } from './config/i18n'
 // import SearchTool from '@/components/searchTool/SearchTool'
 
@@ -38,19 +38,25 @@ const initializeEditor = () => {
     i18n: i18nZhCN,
     tools: {
       header: Header,
-      list: List,
+      list: {
+        class: List,
+        inlineToolbar: true,
+        config: {
+          defaultStyle: 'unordered'
+        }
+      },
       checklist: {
         class: CheckList,
         inlineToolbar: true
       },
       code: Code,
       marker: Marker,
-      textVariant: TextVariantTune,
+      // textVariant: TextVariantTune,
       paragraph: {
-        inlineToolbar: true,
-        tunes: ['textVariant']
+        inlineToolbar: true
+        // tunes: ['textVariant']
       },
-      quote: Quote,
+      // quote: Quote,
       simpleImage: SimpleImage,
       table: Table
       // search: SearchTool
@@ -90,8 +96,17 @@ onBeforeUnmount(() => {
 </template>
 <style lang="less" scoped>
 #editorjs-container {
+  overflow-x: hidden;
   :deep(.codex-editor__redactor) {
     padding-bottom: 0 !important;
+    margin-left: 50px;
+    margin-right: initial;
+  }
+  :deep(.codex-editor--narrow) {
+    .ce-toolbar__actions {
+      left: -4px;
+      width: 53px;
+    }
   }
 }
 </style>

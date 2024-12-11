@@ -84,7 +84,7 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-  <div id="editorjs-container" />
+  <div id="editorjs-container" class="custom-scroll" />
 </template>
 <style lang="less" scoped>
 #editorjs-container {

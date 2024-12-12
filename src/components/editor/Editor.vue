@@ -8,9 +8,11 @@ import Table from '@editorjs/table'
 // import Quote from '@editorjs/quote'
 import CheckList from '@editorjs/checklist'
 import Marker from '@editorjs/marker'
+import Paragraph from '@editorjs/paragraph'
 import SimpleImage from '@editorjs/simple-image'
 // import TextVariantTune from '@editorjs/text-variant-tune'
 import { i18nZhCN } from './config/i18n'
+import debounce from 'lodash-es/debounce'
 // import SearchTool from '@/components/searchTool/SearchTool'
 
 const props = defineProps({
@@ -53,6 +55,7 @@ const initializeEditor = () => {
       marker: Marker,
       // textVariant: TextVariantTune,
       paragraph: {
+        class: Paragraph,
         inlineToolbar: true
         // tunes: ['textVariant']
       },
@@ -65,13 +68,19 @@ const initializeEditor = () => {
       ...props.data,
       blocks: props.data?.blocks || []
     },
-    onChange: async (_api, event) => {
-      if (event && !Array.isArray(event) && event.type === 'block-changed') {
-        console.log('内容已更改')
-        const outputData = (await editor.value?.save()) || null
-        emit('change', outputData)
-      }
-    },
+    onChange: debounce(async (_api, event) => {
+      // if (event && !Array.isArray(event)) {
+      //   if (
+      //     event.type === 'block-changed' ||
+      //     event.type === 'block-removed' ||
+      //     event.type === 'block-moved'
+      //   ) {
+      const outputData = (await editor.value?.save()) || null
+      console.log('内容已更改', outputData)
+      emit('change', outputData)
+      //   }
+      // }
+    }, 500),
     onReady: () => {
       emit('getEditorInstance', editor.value)
       if (props.data) {

@@ -21,6 +21,19 @@
     "build:win": "vite build && electron-builder --win --x64",
     "build:mac": "electron-builder --mac"
   },
+  "build": {
+    "appId": "com.dk.todolist",
+    "productName": "todolist",
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "todolist",
+      "uninstallDisplayName": "todolist",
+      "include": "installer.nsh"
+    }
+  },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
     "@editorjs/checklist": "^1.6.0",

@@ -35,6 +35,18 @@
       "shortcutName": "todolist",
       "uninstallDisplayName": "todolist",
       "include": "installer.nsh"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "electron/assets/icons/macos/app-icon.png"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "electron/assets/icons/windows/app-icon.png"
     }
   },
   "dependencies": {

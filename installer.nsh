@@ -1,4 +1,4 @@
-// installer.nsh
+; installer.nsh
 !macro customUnInstall
   ; 删除注册表项
   DeleteRegKey HKLM "Software\todolist"

@@ -3,25 +3,29 @@ name: Electron Release
 on:
   push:
     branches:
-      - local 
+      - local
   release:
     types: [created]
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Use GitHub API
         run: |
           curl -H "Authorization: token ${{ secrets.GH_TOKEN }}" https://api.github.com/user
-          
+
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -40,9 +44,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Build Electron app
         run: pnpm electron:build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -52,3 +60,5 @@ jobs:
             dist/*.dmg
             dist/*.AppImage
             dist/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

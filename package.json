@@ -19,11 +19,14 @@
     "electron:build": "vite build && electron-builder",
     "debug:main": "electron --inspect-brk=9229 ./electron/main.js",
     "build:win": "vite build && electron-builder --win --x64",
-    "build:mac": "electron-builder --mac"
+    "build:mac": "vite build && electron-builder --mac"
   },
   "build": {
     "appId": "com.dk.todolist",
     "productName": "todolist",
+    "directories": {
+      "output": "build/dist"
+    },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,

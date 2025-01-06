@@ -57,8 +57,8 @@ jobs:
         with:
           name: electron-builds-${{ matrix.os }}
           path: |
-            dist/*.dmg
-            dist/*.AppImage
-            dist/*.exe
+            build/dist/*.dmg
+            build/dist/*.AppImage
+            build/dist/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

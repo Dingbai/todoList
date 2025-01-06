@@ -9,7 +9,10 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Use GitHub API
@@ -52,7 +55,9 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: electron-builds
-          path: release.zip
+          name: electron-builds-${{ matrix.os }}
+          path: |
+            build/dist/*.dmg
+            build/dist/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

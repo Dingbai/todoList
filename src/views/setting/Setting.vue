@@ -54,7 +54,6 @@ async function handleSwitchChange(checked: boolean) {
       message.error(res.message)
     }
   } catch (err: unknown) {
-    console.log('err :>> ', err)
     message.error(String(err))
   }
   // window.electronAPI.setAutoLaunch(checked)
@@ -119,19 +118,15 @@ const handleOk = () => {
   visible.value = false
 }
 const restore = async () => {
-  const res = await backup()
-  if (res.success) {
-    const temp = JSON.parse(data.value)
-    localStorage.list = temp
-    dataStore.updateAllData(temp)
-    const id = temp.filter((item: Data) => item.status === 'todo')?.[0]?.id
-    if (id) {
-      dataStore.setId(id)
-    }
-    message.success('恢复成功')
-  } else {
-    message.error(`恢复失败,${res.message}`)
+  const temp = JSON.parse(data.value)
+  localStorage.list = temp
+  dataStore.updateAllData(temp)
+  const id = temp.filter((item: Data) => item.status === 'todo')?.[0]?.id
+  if (id) {
+    dataStore.setId(id)
   }
+  message.success('恢复成功')
+  fileList.value = []
   close()
 }
 const close = () => {
@@ -243,6 +238,7 @@ const handleWindowOptionChange = () => {
         sort
         theme="jv-dark"
         expanded
+        :collapsed="false"
         :value="JSON.parse(data)"
         :expandDepth="2"
       />

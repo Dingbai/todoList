@@ -11,8 +11,7 @@ function setupDataPersistenceApi() {
   // 处理数据备份请求
   ipcMain.handle('backup-local-storage', async (_event, data) => {
     try {
-      await fs.writeFile(BACKUP_FILE, JSON.stringify(data))
-      console.log('备份成功')
+      await fs.writeFile(BACKUP_FILE, data)
       return { success: true, message: '数据备份成功' }
     } catch (error) {
       console.error('备份失败:', error)
@@ -27,19 +26,17 @@ function setupDataPersistenceApi() {
   // 处理文件上传请求
   ipcMain.handle('upload-file', async (_event, path) => {
     try {
-      const fileContent = await fs.readFile(path, 'utf8')
-
-      const jsonData = JSON.parse(fileContent)
+      const jsonData = await fs.readFile(path, 'utf8')
 
       return {
         success: true,
         data: jsonData,
-        message: 'File uploaded successfully'
+        message: '文件上传成功'
       }
     } catch (error) {
       return {
         success: false,
-        message: `Failed to upload file: ${error.message}`
+        message: `文件上传失败: ${error.message}`
       }
     }
   })

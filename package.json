@@ -19,7 +19,9 @@
     "electron:build": "vite build && electron-builder",
     "debug:main": "electron --inspect-brk=9229 ./electron/main.js",
     "build:win": "vite build && electron-builder --win --x64",
-    "build:mac": "vite build && electron-builder --mac"
+    "build:mac": "vite build && electron-builder --mac",
+    "release": "standard-version",
+    "prepare": "husky install"
   },
   "build": {
     "appId": "com.dk.todolist",
@@ -110,10 +112,22 @@
     "vite-plugin-electron": "^0.28.8",
     "vite-plugin-vue-devtools": "^7.3.7",
     "vitest": "^2.0.4",
-    "vue-tsc": "^2.0.29"
+    "vue-tsc": "^2.0.29",
+    "husky": "^8.0.0",
+    "commitlint": "^17.0.0",
+    "@commitlint/config-angular": "^17.0.0",
+    "standard-version": "^9.5.0"
   },
   "engines": {
     "pnpm": ">=9.0.0",
-    "node": ">=22.0.0"
+    "node": ">=21.0.0"
+  },
+  "commitlint": {
+    "extends": ["@commitlint/config-angular"]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }

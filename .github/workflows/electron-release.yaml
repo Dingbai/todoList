@@ -6,10 +6,7 @@ on:
       - main
   pull_request:
     branches:
-      - main # 仅当 PR 的目标分支是 main 时触发
-    types: [opened, synchronize]
-  release:
-    types: [created]
+      - main
 
 jobs:
   build-and-release:

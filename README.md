@@ -18,7 +18,7 @@ A feature-rich desktop todo application built with Electron and Vue.js.
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/yourusername/todolist.git
+git clone https://github.com/Dingbai/todoList.git
 cd todolist
 ```
 

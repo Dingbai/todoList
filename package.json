@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "./electron/main.cjs",
+  "main": "./electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -17,8 +17,37 @@
     "format": "prettier --write src/",
     "electron:dev": "vite --mode=development",
     "electron:build": "vite build && electron-builder",
-    "debug:main": "electron --inspect-brk=9229 ./electron/main.cjs",
-    "build:win": "vite build && electron-builder --win --x64"
+    "debug:main": "electron --inspect-brk=9229 ./electron/main.js",
+    "build:win": "vite build && electron-builder --win --x64",
+    "build:mac": "vite build && electron-builder --mac",
+    "release": "standard-version",
+    "prepare": "husky install"
+  },
+  "build": {
+    "appId": "com.dk.todolist",
+    "productName": "todolist",
+    "directories": {
+      "output": "build/dist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "todolist",
+      "uninstallDisplayName": "todolist",
+      "include": "installer.nsh"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ]
+    }
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
@@ -28,28 +57,36 @@
     "@editorjs/header": "^2.8.7",
     "@editorjs/list": "^1.10.0",
     "@editorjs/marker": "^1.4.0",
+    "@editorjs/paragraph": "^2.11.6",
     "@editorjs/quote": "^2.7.2",
     "@editorjs/simple-image": "^1.6.0",
     "@editorjs/table": "^2.4.2",
     "@editorjs/text-variant-tune": "^1.0.3",
     "ant-design-vue": "4.x",
+    "auto-launch": "^5.0.6",
+    "classnames": "^2.5.1",
     "clipboard": "^2.0.11",
+    "dayjs": "^1.11.13",
     "editorjs-button": "^3.0.3",
     "editorjs-drag-drop": "^1.1.16",
     "editorjs-go": "github:micheleriva/editorjs-go",
     "editorjs-layout": "^1.2.5",
+    "electron-store": "^10.0.0",
+    "lodash-es": "^4.17.21",
     "moment": "^2.30.1",
     "pinia": "^2.2.0",
     "react-editor-js": "^2.1.0",
     "uuid": "^10.0.0",
     "vue": "^3.4.34",
     "vue-router": "^4.4.0",
-    "vue3-json-viewer": "^2.2.2"
+    "vue3-json-viewer": "^2.2.2",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.10.3",
     "@tsconfig/node20": "^20.1.4",
     "@types/jsdom": "^21.1.7",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.14.12",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.1.0",
@@ -75,6 +112,22 @@
     "vite-plugin-electron": "^0.28.8",
     "vite-plugin-vue-devtools": "^7.3.7",
     "vitest": "^2.0.4",
-    "vue-tsc": "^2.0.29"
+    "vue-tsc": "^2.0.29",
+    "husky": "^8.0.0",
+    "commitlint": "^17.0.0",
+    "@commitlint/config-angular": "^17.0.0",
+    "standard-version": "^9.5.0"
+  },
+  "engines": {
+    "pnpm": ">=9.0.0",
+    "node": ">=21.0.0"
+  },
+  "commitlint": {
+    "extends": ["@commitlint/config-angular"]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }

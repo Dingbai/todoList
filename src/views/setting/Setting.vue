@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { App, type UploadChangeParam } from 'ant-design-vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import {
   InboxOutlined,
   InfoCircleOutlined,
@@ -10,6 +10,7 @@ import {
   CopyOutlined
 } from '@ant-design/icons-vue'
 import { type OutputData } from '@editorjs/editorjs'
+import Column from '@/components/column/Column.vue'
 
 import { LocalStorageManager } from '@/utils/backup'
 import { JsonViewer } from 'vue3-json-viewer'
@@ -27,6 +28,8 @@ const fileList = ref([])
 const data = ref('')
 const visible = ref(false)
 const previewData = ref<OutputData>({ blocks: [] })
+const checked = ref(false)
+const windowCloseOption = ref('ask')
 
 const handleChange = (info: UploadChangeParam) => {
   const isJson = info.file.type === 'application/json'
@@ -35,6 +38,27 @@ const handleChange = (info: UploadChangeParam) => {
     fileList.value = []
   }
 }
+onMounted(async () => {
+  const state = await window.electronAPI.getAutoLaunchState()
+  checked.value = state
+  const option = await window.electronAPI.getQuitAction()
+  windowCloseOption.value = option
+})
+
+async function handleSwitchChange(checked: boolean) {
+  try {
+    const res = await window.electronAPI.toggleAutoLaunch(checked)
+    if (res.success) {
+      message.success(res.message)
+    } else {
+      message.error(res.message)
+    }
+  } catch (err: unknown) {
+    message.error(String(err))
+  }
+  // window.electronAPI.setAutoLaunch(checked)
+}
+
 async function handleCustomRequest({
   file,
   onSuccess,
@@ -94,19 +118,15 @@ const handleOk = () => {
   visible.value = false
 }
 const restore = async () => {
-  const res = await backup()
-  if (res.success) {
-    const temp = JSON.parse(data.value)
-    localStorage.list = temp
-    dataStore.updateAllData(temp)
-    const id = temp.filter((item: Data) => item.status === 'doing')?.[0]?.id
-    if (id) {
-      dataStore.setId(id)
-    }
-    message.success('恢复成功')
-  } else {
-    message.error(`恢复失败,${res.message}`)
+  const temp = JSON.parse(data.value)
+  localStorage.list = temp
+  dataStore.updateAllData(temp)
+  const id = temp.filter((item: Data) => item.status === 'todo')?.[0]?.id
+  if (id) {
+    dataStore.setId(id)
   }
+  message.success('恢复成功')
+  fileList.value = []
   close()
 }
 const close = () => {
@@ -125,34 +145,47 @@ const copy = (text: string) => {
     message.success('复制成功')
   })
 }
+const handleWindowOptionChange = () => {
+  window.electronAPI.setQuitAction(windowCloseOption.value)
+}
 </script>
 <template>
   <div class="setting-container">
     <div class="setting-content">
       <h1>setting</h1>
       <a-row>
-        <a-col :span="3">
-          <div class="backup label">
-            数据备份
-            <a-popover placement="bottomLeft">
-              <template #content>
-                <div>
-                  备份路径：{{ backupPath }}<CopyOutlined class="copy" @click="copy(backupPath)" />
-                </div>
-              </template>
-              <InfoCircleOutlined />
-            </a-popover>
-          </div>
-        </a-col>
-        <a-col :span="10">
+        <Column label="窗口关闭选项" :labelCol="{ span: 3 }">
+          <a-radio-group
+            v-model:value="windowCloseOption"
+            name="radioGroup"
+            @change="handleWindowOptionChange"
+          >
+            <a-radio value="ask">询问</a-radio>
+            <a-radio value="quit">直接关闭</a-radio>
+            <a-radio value="minimize">最小化到托盘</a-radio>
+          </a-radio-group>
+        </Column>
+        <Column label="开机自启动" :labelCol="{ span: 3 }">
+          <a-switch v-model:checked="checked" @change="handleSwitchChange" />
+        </Column>
+        <Column :labelCol="{ span: 3 }">
+          <template #label>
+            <div class="backup label">
+              数据备份
+              <a-popover placement="bottomLeft">
+                <template #content>
+                  <div>
+                    备份路径：{{ backupPath }}
+                    <CopyOutlined class="copy" @click="copy(backupPath)" />
+                  </div>
+                </template>
+                <InfoCircleOutlined />
+              </a-popover>
+            </div>
+          </template>
           <a-button type="primary" @click="backup">备份</a-button>
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="3">
-          <div class="label">数据恢复</div>
-        </a-col>
-        <a-col :span="10">
+        </Column>
+        <Column label="数据恢复" :labelCol="{ span: 3 }">
           <a-upload-dragger
             v-model:fileList="fileList"
             name="file"
@@ -182,7 +215,7 @@ const copy = (text: string) => {
               </template>
             </a-list>
           </div>
-        </a-col>
+        </Column>
       </a-row>
     </div>
     <a-modal v-model:open="visible" title="数据预览/恢复" @ok="handleOk" centered>
@@ -200,13 +233,14 @@ const copy = (text: string) => {
         </a-space>
       </template>
       <JsonViewer
-        :value="JSON.parse(data)"
         copyable
         boxed
         sort
         theme="jv-dark"
-        :expandDepth="2"
         expanded
+        :collapsed="false"
+        :value="JSON.parse(data)"
+        :expandDepth="2"
       />
     </a-modal>
   </div>
@@ -219,14 +253,7 @@ const copy = (text: string) => {
   font-size: 16px;
   .setting-content {
     :deep(.ant-row) {
-      margin-top: 10px;
-      .ant-col {
-        > .label {
-          display: flex;
-          justify-content: flex-end;
-          padding-right: 8px;
-        }
-      }
+      margin-top: 16px;
     }
     .backup {
       align-items: center;

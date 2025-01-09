@@ -1,6 +1,6 @@
 export class LocalStorageManager {
   static async backup() {
-    const data = JSON.stringify(localStorage.list || {})
+    const data = localStorage.list || '{}'
     return await window.electronAPI.backupLocalStorage(data)
   }
 

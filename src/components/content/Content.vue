@@ -6,9 +6,11 @@ import Editor from '@/components/editor/Editor.vue'
 import { useDataStore } from '@/stores/update'
 
 const title = ref('')
+// const searchValue = ref('')
 const editData = ref<OutputData | null>(null)
 const editorInstance = ref<EditorJS | null>(null)
 const dataStore = useDataStore()
+// const top = ref<number>(10)
 
 watch(
   () => dataStore.id,
@@ -55,6 +57,9 @@ const getEditorInstance = (instance: EditorJS) => {
 </script>
 <template>
   <div class="edit-container">
+    <!-- <a-affix :offset-top="top">
+      <a-input v-model:value="searchValue" />
+    </a-affix> -->
     <a-input v-model:value="title" @change="handleChange" placeholder="准备做什么？" />
     <Editor
       :data="editData || { version: '', time: 0, blocks: [] }"
@@ -77,7 +82,7 @@ const getEditorInstance = (instance: EditorJS) => {
   }
   :deep(#editorjs-container) {
     height: calc(100vh - 60px);
-    padding: 0 10px;
+    padding: 0 10px 0 4px;
     box-sizing: border-box;
     overflow: auto;
   }

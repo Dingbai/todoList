@@ -5,11 +5,15 @@ import Header from '@editorjs/header'
 import List from '@editorjs/list'
 import Code from '@editorjs/code'
 import Table from '@editorjs/table'
-import Quote from '@editorjs/quote'
+// import Quote from '@editorjs/quote'
 import CheckList from '@editorjs/checklist'
 import Marker from '@editorjs/marker'
+import Paragraph from '@editorjs/paragraph'
 import SimpleImage from '@editorjs/simple-image'
-import TextVariantTune from '@editorjs/text-variant-tune'
+// import TextVariantTune from '@editorjs/text-variant-tune'
+import { i18nZhCN } from './config/i18n'
+import debounce from 'lodash-es/debounce'
+// import SearchTool from '@/components/searchTool/SearchTool'
 
 const props = defineProps({
   data: {
@@ -33,35 +37,50 @@ const initializeEditor = () => {
     holder: editorId,
     readOnly: props.config.readOnly,
     inlineToolbar: ['link', 'marker', 'bold', 'italic'],
+    i18n: i18nZhCN,
     tools: {
       header: Header,
-      list: List,
+      list: {
+        class: List,
+        inlineToolbar: true,
+        config: {
+          defaultStyle: 'unordered'
+        }
+      },
       checklist: {
         class: CheckList,
         inlineToolbar: true
       },
       code: Code,
       marker: Marker,
-      textVariant: TextVariantTune,
+      // textVariant: TextVariantTune,
       paragraph: {
-        inlineToolbar: true,
-        tunes: ['textVariant']
+        class: Paragraph,
+        inlineToolbar: true
+        // tunes: ['textVariant']
       },
-      quote: Quote,
+      // quote: Quote,
       simpleImage: SimpleImage,
       table: Table
+      // search: SearchTool
     },
     data: {
       ...props.data,
       blocks: props.data?.blocks || []
     },
-    onChange: async (_api, event) => {
-      if (event && !Array.isArray(event) && event.type === 'block-changed') {
-        console.log('内容已更改')
-        const outputData = (await editor.value?.save()) || null
-        emit('change', outputData)
-      }
-    },
+    onChange: debounce(async (_api, event) => {
+      // if (event && !Array.isArray(event)) {
+      //   if (
+      //     event.type === 'block-changed' ||
+      //     event.type === 'block-removed' ||
+      //     event.type === 'block-moved'
+      //   ) {
+      const outputData = (await editor.value?.save()) || null
+      console.log('内容已更改', outputData)
+      emit('change', outputData)
+      //   }
+      // }
+    }, 500),
     onReady: () => {
       emit('getEditorInstance', editor.value)
       if (props.data) {
@@ -77,21 +96,26 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (editor.value) {
-    editor.value.destroy()
+    editor.value?.destroy()
   }
 })
 </script>
 <template>
-  <div id="editorjs-container" />
+  <div id="editorjs-container" class="custom-scroll" />
 </template>
 <style lang="less" scoped>
 #editorjs-container {
-  // // height: calc(100vh - 60px);
-  // // padding: 0 11px;
-  // box-sizing: border-box;
-  // overflow: auto;
+  overflow-x: hidden;
   :deep(.codex-editor__redactor) {
     padding-bottom: 0 !important;
+    margin-left: 50px;
+    margin-right: initial;
+  }
+  :deep(.codex-editor--narrow) {
+    .ce-toolbar__actions {
+      left: -4px;
+      width: 53px;
+    }
   }
 }
 </style>

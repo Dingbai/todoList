@@ -22,12 +22,14 @@ export default defineConfig({
       ]
     }),
     electron({
-      entry: 'electron/main.cjs'
+      entry: 'electron/main.js'
     })
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@img': fileURLToPath(new URL('./src/assets/images', import.meta.url)),
+      '@com': fileURLToPath(new URL('./src/components', import.meta.url))
     }
   }
 })

@@ -68,6 +68,7 @@ jobs:
       - name: Push Changes
         run: |
           git push --follow-tags origin refs/heads/${{ env.CURRENT_BRANCH }}
+
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 

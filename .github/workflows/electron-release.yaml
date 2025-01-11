@@ -59,12 +59,15 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          # Get the current branch name
-          echo "CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+          # Get the current branch name from GITHUB_REF
+          echo "CURRENT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Debug CURRENT_BRANCH
+        run: echo "CURRENT_BRANCH is ${{ env.CURRENT_BRANCH }}"
 
       - name: Push Changes
         run: |
-          git push --follow-tags origin ${{ env.CURRENT_BRANCH }}
+          git push --follow-tags origin refs/heads/${{ env.CURRENT_BRANCH }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 

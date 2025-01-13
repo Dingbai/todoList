@@ -1,27 +1,19 @@
 {
   "name": "todolist",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "main": "./electron/main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
-    "test:unit": "vitest",
-    "test:e2e": "start-server-and-test preview http://localhost:4173 'cypress run --e2e'",
-    "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'",
-    "build-only": "vite build",
-    "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/",
     "electron:dev": "vite --mode=development",
     "electron:build": "vite build && electron-builder",
     "debug:main": "electron --inspect-brk=9229 ./electron/main.js",
     "build:win": "vite build && electron-builder --win --x64",
     "build:mac": "vite build && electron-builder --mac",
-    "release": "standard-version",
-    "prepare": "husky install"
+    "type-check": "vue-tsc --build --force",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "format": "prettier --write src/",
+    "release": "node scripts/check-husky.js && standard-version"
   },
   "build": {
     "appId": "com.dk.todolist",
@@ -123,7 +115,9 @@
     "node": ">=21.0.0"
   },
   "commitlint": {
-    "extends": ["@commitlint/config-angular"]
+    "extends": [
+      "@commitlint/config-angular"
+    ]
   },
   "husky": {
     "hooks": {

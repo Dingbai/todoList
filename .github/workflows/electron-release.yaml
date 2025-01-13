@@ -1,12 +1,9 @@
 name: Electron Release
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-release:
@@ -58,14 +55,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Commit Changelog
+      - name: Configure Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m "chore(release): update changelog"
-          git pull --rebase origin local
-          git push
+          # Get the current branch name from GITHUB_REF
+          echo "CURRENT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Debug CURRENT_BRANCH
+        run: echo "CURRENT_BRANCH is ${{ env.CURRENT_BRANCH }}"
+
+      - name: Push Changes
+        run: |
+          git push --follow-tags origin refs/heads/${{ env.CURRENT_BRANCH }}
+
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
